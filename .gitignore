@@ -42,6 +42,6 @@ Thumbs.db
 .Trashes
 
 # lib files used for local debugging
-/lib/
-/html/lib/
+# /lib/
+# /html/lib/
 
