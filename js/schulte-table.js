@@ -4,6 +4,43 @@ import * as util from '../lib/util-2021.1.4.js';
 import { SingleClick } from "./general.js"
 
 
+class OneColorSchulteProgress {
+    constructor() {
+        this._currentStep = 1;
+    }
+
+    checkAnswer({ answer }) {
+        if (answer === this._currentStep) {
+            this._currentStep += 1;
+            return true;
+        }
+
+        return false;
+    }
+}
+
+class TwoColorSchulteProgress {
+
+}
+
+class SchulteProgress {
+    constructor({ type }) {
+        if (type === "black") {
+            this._progress = new OneColorSchulteProgress();
+        } else if (type === "red") {
+            this._progress = new TwoColorSchulteProgress();
+        } else {
+            throw new Error(`Schulte Table must be "black" or "red", was ${type}`);
+        }
+    }
+
+    isCorrectAnswer({ answer }) {
+        return this._progress.checkAnswer({ answer });
+    }
+
+
+}
+
 class SchulteSquareModel {
     constructor({ number, numberColor }) {
         this.number = number;
@@ -15,7 +52,6 @@ class SchulteSquareModel {
 class SchulteSquarePresenter {
     constructor({ number, numberColor }) {
         this._model = new SchulteSquareModel({ number, numberColor });
-        this.number = number;
     }
 
     getModelProperties() {
@@ -25,7 +61,8 @@ class SchulteSquarePresenter {
         };
     }
 
-    isCorrectChoice() {
+    isCorrectChoice(progressChecker) {
+        return progressChecker.isCorrectAnswer({ answer: this._model.number });
 
     }
 
@@ -78,7 +115,6 @@ class SchulteSquareView {
     }
 
     contains(mouse) {
-        // console.error(mouse);
         return this._square.contains(mouse);
     }
 
@@ -87,14 +123,22 @@ class SchulteSquareView {
         number._needUpdate = true;
     }
 
-    _startChange(color) {
+    _startChange(color, time) {
         this._changeColor(this._square, this._number, color);
-        setTimeout(this._changeColor, 300, this._square, this._number, this._originalSquareColor);
+        setTimeout(this._changeColor, time, this._square, this._number, this._originalSquareColor);
     }
 
-    showCorrectness() {
-        this._startChange("#FF9090");
-        this._startChange("#90FF90");
+    showCorrectness(progressChecker) {
+        if (this._presenter.isCorrectChoice(progressChecker)) {
+            let lightGreen = "#90FF90";
+            this._startChange(lightGreen, 100);
+        } else {
+            let lightRed = "#FF9090";
+            this._startChange(lightRed, 300);
+        }
+
+
+
     }
 
     draw() {
@@ -115,6 +159,7 @@ class SchulteTable {
         this.squaresNumber = squaresNumber;
 
         this._singleClick = new SingleClick();
+        this._progress = new SchulteProgress({ type: numberColor });
         this._squares = [];
         this._generateSquares(window, side, numberColor);
     }
@@ -155,7 +200,7 @@ class SchulteTable {
         for (let square of this._squares) {
             if (mouse.isPressedIn(square)) {
                 console.error(square.getNumber(), this._singleClick.timePressed);
-                square.showCorrectness();
+                square.showCorrectness(this._progress);
             }
         }
     }
