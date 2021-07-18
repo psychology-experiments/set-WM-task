@@ -36,6 +36,7 @@ class SchulteSquareView {
         this._presenter = new SchulteSquarePresenter({ number: squareNumber, numberColor: squareNumberColor });
         const { color, number } = this._presenter.getModelProperties();
 
+        this._originalSquareColor = "#FFFFFF";
         this._square = this._create_square(window, sideSize, position, number);
         this._number = this._create_number(window, sideSize, position, number, color);
     }
@@ -81,25 +82,19 @@ class SchulteSquareView {
         return this._square.contains(mouse);
     }
 
-    _changeGradient(square, number) {
-        let previousColor = square.fillColor["_rgb"];
-        let R = previousColor[0];
-        let G = previousColor[1] - 0.1;
-        let B = previousColor[2] - 0.1;
-
-        console.error("color", R, G, B);
-        square.fillColor = new util.Color([R, G, B]);
-        console.error(square.fillColor);
+    _changeColor(square, number, color) {
+        square.fillColor = new util.Color(color);
         number._needUpdate = true;
     }
 
-    _startGradient() {
-        let gradientTimerId = setInterval(this._changeGradient, 100, this._square, this._number);
-        setTimeout(() => clearInterval(gradientTimerId), 1500);
+    _startChange(color) {
+        this._changeColor(this._square, this._number, color);
+        setTimeout(this._changeColor, 300, this._square, this._number, this._originalSquareColor);
     }
 
     showCorrectness() {
-        this._startGradient();
+        this._startChange("#FF9090");
+        this._startChange("#90FF90");
     }
 
     draw() {
