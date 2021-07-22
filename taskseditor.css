@@ -1,0 +1,29 @@
+body {
+    background-color: hsla(214, 52%, 51%, 0.3);
+}
+
+.subtaskField {
+    border: none;
+    background-color: transparent;
+    font-size: x-large;
+    width: auto;
+}
+
+#tasks {
+    display: table;
+    margin: 100px auto;
+    font-size: xx-large;
+  }
+
+li {
+    list-style: none;
+    padding: 5px;
+}
+
+.subtasks li {
+    display: flex;
+}
+
+.subtasks li input:first-child {
+    flex-grow: 21;
+}   
