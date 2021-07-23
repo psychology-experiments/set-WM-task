@@ -6,7 +6,8 @@ __pycache__/
 *.pyd
 *.so
 
-# Backup files
+# Backup files and folders
+backup/
 *.bak
 ~$*.xls*
 ~$*.doc*
