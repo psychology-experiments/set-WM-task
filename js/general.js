@@ -41,8 +41,15 @@ class SingleClick {
 
 
 class ExperimentOrgaizer {
-    constructor({ }) {
+    constructor({ scheduler, parts }) {
+        this._scheduler = scheduler;
+        this._parts = parts;
+    }
 
+    generateExperimentSequence() {
+        for (let [part, settings] of Object.entries(this._parts)) {
+            this._scheduler.add(settings.routine());
+        }
     }
 }
 
@@ -63,4 +70,9 @@ function cartesian(...arrays) {
 }
 
 
-export { SingleClick, choice, cartesian };
+export {
+    ExperimentOrgaizer,
+    SingleClick,
+    choice,
+    cartesian
+};
