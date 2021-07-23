@@ -77,7 +77,7 @@ class StroopTestPresenter {
     }
 
     _isIncongruent() {
-        return Math.random() < this._congruentStimulusProbability;
+        return Math.random() >= this._congruentStimulusProbability;
     }
 }
 
