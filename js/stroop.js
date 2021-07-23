@@ -13,7 +13,6 @@ const ALLOWED_SYMBOLS = {
 
 class StroopWord {
     constructor([wordSymbol, colorSymbol]) {
-        console.error("ws", wordSymbol, "cs", colorSymbol);
         this.text = ALLOWED_SYMBOLS[wordSymbol].word;
         this.color = ALLOWED_SYMBOLS[colorSymbol].color;
 
