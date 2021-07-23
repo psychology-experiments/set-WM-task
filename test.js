@@ -13,6 +13,7 @@ import * as util from './lib/util-2021.1.4.js';
 import { ExperimentOrgaizer } from './js/general.js';
 import { SchulteTable } from './js/schulte-table.js';
 import { StroopTest } from './js/stroop.js';
+import { Anagrams } from './js/anagrams.js';
 
 //some handy aliases as in the psychopy scripts;
 const { abs, sin, cos, PI: pi, sqrt } = Math;
@@ -57,7 +58,7 @@ let experimentParts = {
   "digit span": { "routine": DummyRoutine },
   "black schulte": { "routine": blackSchulteTableRoutine },
   "black and red schulte": { "routine": DummyRoutine },
-  "anagrams": { "routine": DummyRoutine },
+  "anagrams": { "routine": anagramsRoutine },
 };
 
 const experimentSequence = new ExperimentOrgaizer({ scheduler: flowScheduler, parts: experimentParts });
@@ -104,6 +105,7 @@ function updateInfo() {
 var trialClock;
 var blackSchulteTable;
 var stroop;
+var anagrams;
 var globalClock;
 var routineTimer;
 var mouse;
@@ -121,6 +123,10 @@ function experimentInit() {
   stroop = new StroopTest({
     window: psychoJS.window,
     stimuliFP: "materials/Stroop/BB.png"
+  });
+
+  anagrams = new Anagrams({
+    winnow: psychoJS.window,
   });
 
   // testORA =
@@ -143,6 +149,12 @@ function blackSchulteTableRoutine(snapshot) {
     // check for quit (typically the Esc key)
     if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
       return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      blackSchulteTable.setAutoDraw(false);
+      return Scheduler.Event.NEXT;
     }
 
     // check if the Routine should terminate
@@ -173,22 +185,40 @@ function stroopRoutine(snapshot) {
       return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
     }
 
-    // check if the Routine should terminate
-    // if (!continueRoutine) {  // a component has requested a forced-end of Routine
-    //   return Scheduler.Event.NEXT;
-    // }
+    // Developer's option to look on different tasks
+    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      return Scheduler.Event.NEXT;
+    }
 
-    // refresh the screen if continuing
-    // if (continueRoutine && routineTimer.getTime() > 0) {
-    //   return Scheduler.Event.FLIP_REPEAT;
-    // } else {
-    //   return Scheduler.Event.NEXT;
-    // }
 
     return Scheduler.Event.FLIP_REPEAT;
   };
 
 }
+
+
+function anagramsRoutine(snapshot) {
+  setInterval(() => stroop.nextStimulus(), 1000);
+  return function () {
+    anagrams.draw();
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      return Scheduler.Event.NEXT;
+    }
+
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+
+}
+
+
 
 
 function DummyRoutine(snapshot) {

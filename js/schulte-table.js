@@ -148,8 +148,8 @@ class SchulteSquareView {
     }
 
     setAutoDraw(isToAutoDraw) {
-        this._square.draw(isToAutoDraw);
-        this._number.draw(isToAutoDraw);
+        this._square.setAutoDraw(isToAutoDraw);
+        this._number.setAutoDraw(isToAutoDraw);
     }
 }
 
@@ -213,6 +213,7 @@ class SchulteTable {
     setAutoDraw(isToAutoDraw) {
         this._squares.forEach(square => square.setAutoDraw(isToAutoDraw));
     }
+
 }
 
 export { SchulteTable };
