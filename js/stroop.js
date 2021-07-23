@@ -4,20 +4,29 @@ import * as util from '../lib/util-2021.1.4.js';
 import { cartesian, choice } from "./general.js";
 
 
-const ALLOWED_SYMBOLS = { "R": "red", "G": "green", "B": "blue", "Y": "yellow" };
+const ALLOWED_SYMBOLS = {
+    R: { word: "красный", color: "red" },
+    G: { word: "зелёный", color: "green" },
+    B: { word: "синий", color: "blue" },
+    Y: { word: "жёлтый", color: "yellow" },
+};
 
 class StroopWord {
     constructor([wordSymbol, colorSymbol]) {
-        this.text = ALLOWED_SYMBOLS[wordSymbol];
-        this.color = ALLOWED_SYMBOLS[colorSymbol];
+        console.error("ws", wordSymbol, "cs", colorSymbol);
+        this.text = ALLOWED_SYMBOLS[wordSymbol].word;
+        this.color = ALLOWED_SYMBOLS[colorSymbol].color;
+
         this.congurent = wordSymbol === colorSymbol;
 
         if (this.text === undefined || this.color === undefined) {
             const supportedSymbols = Object.keys(ALLOWED_SYMBOLS);
-            throw Error(`Was used unsupported symbol 
-            for text "${wordSymbol}" or 
-            color "${colorSymbol}"\n
-            Supported symbols: ${supportedSymbols}`);
+            throw Error(
+                `Was used unsupported symbol 
+                        for text "${wordSymbol}" or 
+                        color "${colorSymbol}"\n
+                        Supported symbols: ${supportedSymbols}`
+            );
         }
     }
 }
@@ -90,6 +99,7 @@ class StroopTestView {
                 color: stimulusInfo.color,
                 height: 100,
                 autoDraw: false,
+                bold: true,
             });
             this._words.push(wordStimulus);
         }
