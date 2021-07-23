@@ -118,14 +118,15 @@ class SchulteSquareView {
         return this._square.contains(mouse);
     }
 
-    _changeColor(square, number, color) {
-        square.fillColor = new util.Color(color);
-        number._needUpdate = true;
+    _changeColor(color) {
+        this._square.fillColor = new util.Color(color);
+        this._number._needUpdate = true;
     }
 
     _startChange(color, time) {
-        this._changeColor(this._square, this._number, color);
-        setTimeout(this._changeColor, time, this._square, this._number, this._originalSquareColor);
+        this._changeColor(color);
+        setTimeout(color => this._changeColor(color), time, this._originalSquareColor);
+
     }
 
     showCorrectness(progressChecker) {
