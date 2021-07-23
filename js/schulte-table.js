@@ -1,7 +1,7 @@
 import * as visual from '../lib/visual-2021.1.4.js';
 import * as util from '../lib/util-2021.1.4.js';
 
-import { SingleClick } from "./general.js"
+import { SingleClick } from "./general.js";
 
 
 class OneColorSchulteProgress {
