@@ -10,7 +10,9 @@ import * as visual from './lib/visual-2021.1.4.js';
 // import * as sound from './lib/sound-2021.1.4.js';
 import * as util from './lib/util-2021.1.4.js';
 
+import { ExperimentOrgaizer } from './js/general.js';
 import { SchulteTable } from './js/schulte-table.js';
+import { StroopTest } from './js/stroop.js';
 
 //some handy aliases as in the psychopy scripts;
 const { abs, sin, cos, PI: pi, sqrt } = Math;
@@ -24,13 +26,13 @@ const psychoJS = new PsychoJS({
 // open window:
 psychoJS.openWindow({
   fullscr: true,
-  color: new util.Color([0, 0, 0]),
+  color: new util.Color("white"),
   units: 'pix',
   waitBlanking: true
 });
 
 // store info about the experiment session:
-let expName = 'test';  // from the Builder filename that created this script
+let expName = 'WM-tasks';  // from the Builder filename that created this script
 let expInfo = { 'participant': '' };
 
 // Start code blocks for 'Before Experiment'
@@ -43,17 +45,27 @@ let expInfo = { 'participant': '' };
 
 const flowScheduler = new Scheduler(psychoJS);
 const dialogCancelScheduler = new Scheduler(psychoJS);
-// psychoJS.scheduleCondition(function() { return (psychoJS.gui.dialogComponent.button === 'OK'); }, flowScheduler, dialogCancelScheduler);
+// psychoJS.scheduleCondition(function () { return (psychoJS.gui.dialogComponent.button === 'OK'); }, flowScheduler, dialogCancelScheduler);
 
 psychoJS.scheduleCondition(function () { return true; }, flowScheduler, dialogCancelScheduler);
 
 
+let experimentParts = {
+  "stroop": { "routine": stroopRoutine },
+  "luchins": { "routine": DummyRoutine },
+  "dembo-rubinstein": { "routine": DummyRoutine },
+  "digit span": { "routine": DummyRoutine },
+  "black schulte": { "routine": blackSchulteTableRoutine },
+  "black and red schulte": { "routine": DummyRoutine },
+  "anagrams": { "routine": DummyRoutine },
+};
+
+const experimentSequence = new ExperimentOrgaizer({ scheduler: flowScheduler, parts: experimentParts });
+
 // flowScheduler gets run if the participants presses OK
 flowScheduler.add(updateInfo); // add timeStamp
 flowScheduler.add(experimentInit);
-flowScheduler.add(trialRoutineBegin());
-flowScheduler.add(trialRoutineEachFrame());
-flowScheduler.add(trialRoutineEnd());
+experimentSequence.generateExperimentSequence();
 flowScheduler.add(quitPsychoJS, '', true);
 
 // quit if user presses Cancel in dialog box:
@@ -63,6 +75,7 @@ psychoJS.start({
   expName: expName,
   expInfo: expInfo,
   resources: [
+    // { 'name': 'materials/Stroop/BB.png', 'path': 'materials/Stroop/BB.png' }
   ]
 });
 
@@ -78,11 +91,9 @@ function updateInfo() {
 
   // store frame rate of monitor if we can measure it successfully
   expInfo.frameRate = psychoJS.window.getActualFrameRate();
-  if (typeof expInfo.frameRate !== 'undefined')
-    frameDur = 1.0 / Math.round(expInfo.frameRate);
-  else
-    frameDur = 1.0 / 60.0; // couldn't get a reliable measure so guess
 
+  // if frameRate is undefined then guess
+  frameDur = typeof expInfo.frameRate !== 'undefined' ? 1.0 / Math.round(expInfo.frameRate) : 1.0 / 60.0;
   // add info from the URL:
   util.addInfoFromUrl(expInfo);
 
@@ -92,9 +103,11 @@ function updateInfo() {
 
 var trialClock;
 var blackSchulteTable;
+var stroop;
 var globalClock;
 var routineTimer;
 var mouse;
+// var testORA;
 function experimentInit() {
   // Initialize components for Routine "trial"
   trialClock = new util.Clock();
@@ -104,6 +117,13 @@ function experimentInit() {
     side: 100,
     squaresNumber: 25,
   });
+
+  stroop = new StroopTest({
+    window: psychoJS.window,
+    stimuliFP: "materials/Stroop/BB.png"
+  });
+
+  // testORA =
 
   mouse = new core.Mouse({ win: psychoJS.window });
 
@@ -115,74 +135,19 @@ function experimentInit() {
 }
 
 
-var t;
-var frameN;
-var continueRoutine;
-var trialComponents;
-function trialRoutineBegin(snapshot) {
+function blackSchulteTableRoutine(snapshot) {
   return function () {
-    //------Prepare to start Routine 'trial'-------
-    t = 0;
-    trialClock.reset(); // clock
-    frameN = -1;
-    continueRoutine = true; // until we're told otherwise
-    // routineTimer.add(30.000000);
-    // update component parameters for each repeat
-
-    // keep track of which components have finished
-    trialComponents = [];
-
-    for (const thisComponent of trialComponents)
-      if ('status' in thisComponent)
-        thisComponent.status = PsychoJS.Status.NOT_STARTED;
-    return Scheduler.Event.NEXT;
-  };
-}
-
-
-var frameRemains;
-function trialRoutineEachFrame(snapshot) {
-  return function () {
-    //------Loop for each frame of Routine 'trial'-------
-    // get current time
-    t = trialClock.getTime();
-    frameN = frameN + 1;// number of completed frames (so 0 is the first frame)
-    // update/draw components on each frame
-
-    // *polygon* updates
-    // if (t >= 0.0 && polygon.status === PsychoJS.Status.NOT_STARTED) {
-    //   // keep track of start time/frame for later
-    //   polygon.tStart = t;  // (not accounting for frame time here)
-    //   polygon.frameNStart = frameN;  // exact frame index
-
-    //   // polygon.setAutoDraw(true);
-    // }
-
-    // frameRemains = 0.0 + 12.0 - psychoJS.window.monitorFramePeriod * 0.75;  // most of one frame period left
-    // if (polygon.status === PsychoJS.Status.STARTED && t >= frameRemains) {
-    //   polygon.setAutoDraw(false);
-    // }
-
-    // polygon.draw();
     blackSchulteTable.getClick(mouse);
     blackSchulteTable.draw();
+
     // check for quit (typically the Esc key)
     if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
       return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
     }
 
     // check if the Routine should terminate
-    if (!continueRoutine) {  // a component has requested a forced-end of Routine
-      return Scheduler.Event.NEXT;
-    }
-
-    // continueRoutine = false;  // reverts to True if at least one component still running
-    // for (const thisComponent of trialComponents) {
-    //   console.error(thisComponent.status);
-    //   if ('status' in thisComponent && thisComponent.status !== PsychoJS.Status.FINISHED) {
-    //     continueRoutine = true;
-    //     break;
-    //   }
+    // if (!continueRoutine) {  // a component has requested a forced-end of Routine
+    //   return Scheduler.Event.NEXT;
     // }
 
     // refresh the screen if continuing
@@ -191,22 +156,46 @@ function trialRoutineEachFrame(snapshot) {
     // } else {
     //   return Scheduler.Event.NEXT;
     // }
+
     return Scheduler.Event.FLIP_REPEAT;
   };
-  
 }
 
 
-function trialRoutineEnd(snapshot) {
+
+function stroopRoutine(snapshot) {
+  setInterval(() => stroop.nextStimulus(), 1000);
   return function () {
-    //------Ending Routine 'trial'-------
-    for (const thisComponent of trialComponents) {
-      if (typeof thisComponent.setAutoDraw === 'function') {
-        thisComponent.setAutoDraw(false);
-      }
+    stroop.draw();
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
     }
+
+    // check if the Routine should terminate
+    // if (!continueRoutine) {  // a component has requested a forced-end of Routine
+    //   return Scheduler.Event.NEXT;
+    // }
+
+    // refresh the screen if continuing
+    // if (continueRoutine && routineTimer.getTime() > 0) {
+    //   return Scheduler.Event.FLIP_REPEAT;
+    // } else {
+    //   return Scheduler.Event.NEXT;
+    // }
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+
+}
+
+
+function DummyRoutine(snapshot) {
+  return function () {
     return Scheduler.Event.NEXT;
   };
+
 }
 
 
