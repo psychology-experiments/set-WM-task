@@ -1,3 +1,6 @@
+import * as util from '../lib/util-2021.1.4.js';
+
+
 class SingleClick {
     constructor() {
         this._isPressed = false;
@@ -36,4 +39,28 @@ class SingleClick {
     }
 }
 
-export { SingleClick };
+
+class ExperimentOrgaizer {
+    constructor({ }) {
+
+    }
+}
+
+function choice(seq) {
+    // Choose a random element from a non-empty sequence.
+    let length = seq.length;
+
+    if (length === 0) {
+        throw Error('Cannot choose from an empty sequence');
+    }
+
+    let i = Math.floor(Math.random() * length);
+    return seq[i];
+}
+
+function cartesian(...arrays) {
+    return arrays.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+}
+
+
+export { SingleClick, choice, cartesian };
