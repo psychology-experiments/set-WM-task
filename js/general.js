@@ -41,17 +41,33 @@ class SingleClick {
 
 
 class ExperimentOrgaizer {
-    constructor({ scheduler, parts }) {
+    constructor({ scheduler, parts, isDeveloped, showOnly }) {
         this._scheduler = scheduler;
         this._parts = parts;
+        this.isDeveloped = isDeveloped;
+        this._showOnly = showOnly;
+    }
+
+    _isToShowDelopment(settings) {
+        return settings.isForExperiment || this.isDeveloped;
+
     }
 
     generateExperimentSequence() {
-        for (let [part, settings] of Object.entries(this._parts)) {
+        if (this._showOnly !== null) {
+            this._scheduler.add(this._parts[this._showOnly].routine());
+            return;
+        }
+
+        let routines = Object.entries(this._parts)
+            .filter(([_, settings]) => this._isToShowDelopment(settings));
+
+        for (let [part, settings] of routines) {
             this._scheduler.add(settings.routine());
         }
     }
 }
+
 
 function choice(seq) {
     // Choose a random element from a non-empty sequence.
@@ -64,6 +80,7 @@ function choice(seq) {
     let i = Math.floor(Math.random() * length);
     return seq[i];
 }
+
 
 function cartesian(...arrays) {
     return arrays.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));

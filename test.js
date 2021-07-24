@@ -52,16 +52,22 @@ psychoJS.scheduleCondition(function () { return true; }, flowScheduler, dialogCa
 
 
 let experimentParts = {
-  "stroop": { "routine": stroopRoutine },
-  "luchins": { "routine": DummyRoutine },
-  "dembo-rubinstein": { "routine": DummyRoutine },
-  "digit span": { "routine": DummyRoutine },
-  "black schulte": { "routine": blackSchulteTableRoutine },
-  "black and red schulte": { "routine": DummyRoutine },
-  "anagrams": { "routine": anagramsRoutine },
+  "developer message": { "routine": developerMessage, "instruction": null, "isForExperiment": false },
+  "stroop": { "routine": stroopRoutine, "instruction": null, "isForExperiment": true },
+  "luchins": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
+  "dembo-rubinstein": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
+  "digit span": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
+  "black schulte": { "routine": blackSchulteTableRoutine, "instruction": null, "isForExperiment": true },
+  "black and red schulte": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
+  "anagrams": { "routine": anagramsRoutine, "instruction": null, "isForExperiment": true },
 };
 
-const experimentSequence = new ExperimentOrgaizer({ scheduler: flowScheduler, parts: experimentParts });
+const experimentSequence = new ExperimentOrgaizer({
+  scheduler: flowScheduler,
+  parts: experimentParts,
+  isDeveloped: true,
+  showOnly: null,
+});
 
 // flowScheduler gets run if the participants presses OK
 flowScheduler.add(updateInfo); // add timeStamp
@@ -140,6 +146,26 @@ function experimentInit() {
   return Scheduler.Event.NEXT;
 }
 
+function developerMessage(snapshot) {
+  let developerInstruction = new visual.TextStim({
+    win: psychoJS.window,
+    color: new util.Color("black"),
+    height: 100,
+    text: 'Код находится в процессе разработки.\nДля переключения между задачами используйте клавишу "q"',
+    wrapWidth: psychoJS.window.size[0] * 0.8,
+  });
+  return function () {
+    developerInstruction.draw();
+    // Developer's option to look on different tasks
+    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      developerInstruction.setAutoDraw(false);
+      return Scheduler.Event.NEXT;
+    }
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+}
+
 
 function blackSchulteTableRoutine(snapshot) {
   return function () {
@@ -152,7 +178,7 @@ function blackSchulteTableRoutine(snapshot) {
     }
 
     // Developer's option to look on different tasks
-    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
       blackSchulteTable.setAutoDraw(false);
       return Scheduler.Event.NEXT;
     }
@@ -176,7 +202,7 @@ function blackSchulteTableRoutine(snapshot) {
 
 
 function stroopRoutine(snapshot) {
-  setInterval(() => stroop.nextStimulus(), 1000);
+  let stropAutoChangerId = setInterval(() => stroop.nextStimulus(), 1000);
   return function () {
     stroop.draw();
 
@@ -186,7 +212,8 @@ function stroopRoutine(snapshot) {
     }
 
     // Developer's option to look on different tasks
-    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      clearInterval(stropAutoChangerId);
       return Scheduler.Event.NEXT;
     }
 
@@ -208,7 +235,7 @@ function anagramsRoutine(snapshot) {
     }
 
     // Developer's option to look on different tasks
-    if (psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
       return Scheduler.Event.NEXT;
     }
 
