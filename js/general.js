@@ -83,6 +83,10 @@ function choice(seq) {
     return seq[i];
 }
 
+function choices(seq, k=1) {
+    return new Array(k).fill(null).map(() => choice(seq));
+}
+
 
 function cartesian(...arrays) {
     return arrays.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
@@ -93,5 +97,6 @@ export {
     ExperimentOrgaizer,
     SingleClick,
     choice,
+    choices,
     cartesian
 };
