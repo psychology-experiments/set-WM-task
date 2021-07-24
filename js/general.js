@@ -41,9 +41,11 @@ class SingleClick {
 
 
 class ExperimentOrgaizer {
-    constructor({ scheduler, parts, isDeveloped, showOnly }) {
+    constructor({ scheduler, parts, tasksAtTheBeginning, isDeveloped, showOnly, }) {
         this._scheduler = scheduler;
         this._parts = parts;
+        this._tasksAtTheBeginning = tasksAtTheBeginning;
+
         this.isDeveloped = isDeveloped;
         this._showOnly = showOnly;
     }

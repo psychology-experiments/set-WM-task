@@ -12,6 +12,10 @@ class AnagramsView {
         });
     }
 
+    stop() {
+        this.dummy.setAutoDraw(false);
+    }
+
     draw() {
         this.dummy.draw();
     }

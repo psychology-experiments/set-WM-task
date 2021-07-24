@@ -14,6 +14,9 @@ import { ExperimentOrgaizer } from './js/general.js';
 import { SchulteTable } from './js/schulte-table.js';
 import { StroopTest } from './js/stroop.js';
 import { Anagrams } from './js/anagrams.js';
+import { Luchins } from './js/luchins.js';
+import { DemboRubinstein } from './js/dembo-rubinstein.js';
+import { DigitSpan } from './js/digit-span.js';
 
 //some handy aliases as in the psychopy scripts;
 const { abs, sin, cos, PI: pi, sqrt } = Math;
@@ -54,17 +57,18 @@ psychoJS.scheduleCondition(function () { return true; }, flowScheduler, dialogCa
 let experimentParts = {
   "developer message": { "routine": developerMessage, "instruction": null, "isForExperiment": false },
   "stroop": { "routine": stroopRoutine, "instruction": null, "isForExperiment": true },
-  "luchins": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
-  "dembo-rubinstein": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
-  "digit span": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
-  "black schulte": { "routine": blackSchulteTableRoutine, "instruction": null, "isForExperiment": true },
-  "black and red schulte": { "routine": DummyRoutine, "instruction": null, "isForExperiment": true },
+  "luchins": { "routine": luchinsRoutine, "instruction": null, "isForExperiment": true },
+  "dembo-rubinstein": { "routine": demboRubisteinRoutine, "instruction": null, "isForExperiment": true },
+  "digit span": { "routine": digitSpanRoutine, "instruction": null, "isForExperiment": true },
+  "black schulte": { "routine": onlyBlackSchulteTableRoutine, "instruction": null, "isForExperiment": true },
+  "black and red schulte": { "routine": blackAndRedSchulteTableRoutine, "instruction": null, "isForExperiment": true },
   "anagrams": { "routine": anagramsRoutine, "instruction": null, "isForExperiment": true },
 };
 
 const experimentSequence = new ExperimentOrgaizer({
   scheduler: flowScheduler,
   parts: experimentParts,
+  tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
   isDeveloped: true,
   showOnly: null,
 });
@@ -109,9 +113,13 @@ function updateInfo() {
 
 
 var trialClock;
-var blackSchulteTable;
+var onlyBlackSchulteTable;
+var blackAndRedSchulteTable;
 var stroop;
 var anagrams;
+var luchins;
+var demboRubinstein;
+var digitSpan;
 var globalClock;
 var routineTimer;
 var mouse;
@@ -120,10 +128,16 @@ function experimentInit() {
   // Initialize components for Routine "trial"
   trialClock = new util.Clock();
 
-  blackSchulteTable = new SchulteTable({
+  onlyBlackSchulteTable = new SchulteTable({
     window: psychoJS.window,
     side: 100,
     squaresNumber: 25,
+  });
+
+  blackAndRedSchulteTable = new SchulteTable({
+    window: psychoJS.window,
+    side: 100,
+    squaresNumber: 49,
   });
 
   stroop = new StroopTest({
@@ -132,6 +146,18 @@ function experimentInit() {
   });
 
   anagrams = new Anagrams({
+    winnow: psychoJS.window,
+  });
+
+  luchins = new Luchins({
+    winnow: psychoJS.window,
+  });
+
+  demboRubinstein = new DemboRubinstein({
+    winnow: psychoJS.window,
+  });
+
+  digitSpan = new DigitSpan({
     winnow: psychoJS.window,
   });
 
@@ -167,10 +193,10 @@ function developerMessage(snapshot) {
 }
 
 
-function blackSchulteTableRoutine(snapshot) {
+function onlyBlackSchulteTableRoutine(snapshot) {
   return function () {
-    blackSchulteTable.getClick(mouse);
-    blackSchulteTable.draw();
+    onlyBlackSchulteTable.getClick(mouse);
+    onlyBlackSchulteTable.draw();
 
     // check for quit (typically the Esc key)
     if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
@@ -179,7 +205,39 @@ function blackSchulteTableRoutine(snapshot) {
 
     // Developer's option to look on different tasks
     if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
-      blackSchulteTable.setAutoDraw(false);
+      onlyBlackSchulteTable.setAutoDraw(false);
+      return Scheduler.Event.NEXT;
+    }
+
+    // check if the Routine should terminate
+    // if (!continueRoutine) {  // a component has requested a forced-end of Routine
+    //   return Scheduler.Event.NEXT;
+    // }
+
+    // refresh the screen if continuing
+    // if (continueRoutine && routineTimer.getTime() > 0) {
+    //   return Scheduler.Event.FLIP_REPEAT;
+    // } else {
+    //   return Scheduler.Event.NEXT;
+    // }
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+}
+
+function blackAndRedSchulteTableRoutine(snapshot) {
+  return function () {
+    blackAndRedSchulteTable.getClick(mouse);
+    blackAndRedSchulteTable.draw();
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      blackAndRedSchulteTable.setAutoDraw(false);
       return Scheduler.Event.NEXT;
     }
 
@@ -214,6 +272,7 @@ function stroopRoutine(snapshot) {
     // Developer's option to look on different tasks
     if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
       clearInterval(stropAutoChangerId);
+      stroop.stop();
       return Scheduler.Event.NEXT;
     }
 
@@ -225,7 +284,6 @@ function stroopRoutine(snapshot) {
 
 
 function anagramsRoutine(snapshot) {
-  setInterval(() => stroop.nextStimulus(), 1000);
   return function () {
     anagrams.draw();
 
@@ -236,6 +294,7 @@ function anagramsRoutine(snapshot) {
 
     // Developer's option to look on different tasks
     if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      anagrams.stop();
       return Scheduler.Event.NEXT;
     }
 
@@ -246,6 +305,70 @@ function anagramsRoutine(snapshot) {
 }
 
 
+function luchinsRoutine(snapshot) {
+  return function () {
+    luchins.draw();
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      luchins.stop();
+      return Scheduler.Event.NEXT;
+    }
+
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+
+}
+
+
+function demboRubisteinRoutine(snapshot) {
+  return function () {
+    demboRubinstein.draw();
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      demboRubinstein.stop();
+      return Scheduler.Event.NEXT;
+    }
+
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+
+}
+
+
+function digitSpanRoutine(snapshot) {
+  return function () {
+    digitSpan.draw();
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (experimentSequence.isDeveloped && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      digitSpan.stop();
+      return Scheduler.Event.NEXT;
+    }
+
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+
+}
 
 
 function DummyRoutine(snapshot) {

@@ -7,8 +7,13 @@ class LuchinsView {
             win: winnow,
             color: new util.Color("black"),
             height: 100,
-            text: 'Здесь должны были быть задания Лачинсов, но они пока не готовы.\nНажмите "q", чтобы посмотреть что из задач готово'
+            text: 'Здесь должны были быть задания Лачинсов, но они пока не готовы.\nНажмите "q", чтобы посмотреть что из задач готово',
+            wrapWidth: winnow.size[0] * 0.8,
         });
+    }
+
+    stop() {
+        this.dummy.setAutoDraw(false);
     }
 
     draw() {
@@ -16,4 +21,4 @@ class LuchinsView {
     }
 }
 
-export {LuchinsView as LuchinsView};
+export {LuchinsView as Luchins};

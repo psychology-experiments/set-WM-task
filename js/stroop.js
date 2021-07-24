@@ -115,6 +115,10 @@ class StroopTestView {
         this._currentStimulus = this._words[stimulusIdx];
     }
 
+    stop() {
+        this._currentStimulus.setAutoDraw(false);
+    }
+
     draw() {
         this._currentStimulus.draw();
     }
