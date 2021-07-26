@@ -33,9 +33,9 @@ class StroopWord {
             const supportedSymbols = Object.keys(ALLOWED_SYMBOLS);
             throw Error(
                 `Was used unsupported symbol 
-                        for text "${wordSymbol}" or 
-                        color "${colorSymbol}"\n
-                        Supported symbols: ${supportedSymbols}`
+                for text "${wordSymbol}" or 
+                color "${colorSymbol}"\n
+                Supported symbols: ${supportedSymbols}`
             );
         }
     }

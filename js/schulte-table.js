@@ -1,7 +1,7 @@
 import * as visual from '../lib/visual-2021.1.4.js';
 import * as util from '../lib/util-2021.1.4.js';
 
-import { SingleClick } from "./general.js";
+import { SingleMouseClick } from "./general.js";
 
 
 class OneColorSchulteProgress {
@@ -159,7 +159,7 @@ class SchulteTable {
         this.status = undefined;
         this.squaresNumber = squaresNumber;
 
-        this._singleClick = new SingleClick();
+        this._singleClick = new SingleMouseClick();
         this._progress = new SchulteProgress({ type: numberColor });
         this._squares = [];
         this._generateSquares(window, side, numberColor);

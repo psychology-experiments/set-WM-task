@@ -1,7 +1,7 @@
 import * as util from '../lib/util-2021.1.4.js';
 
 
-class SingleClick {
+class SingleMouseClick {
     constructor() {
         this._isPressed = false;
         this._timePressed = null;
@@ -95,7 +95,7 @@ function cartesian(...arrays) {
 
 export {
     ExperimentOrgaizer,
-    SingleClick,
+    SingleMouseClick,
     choice,
     choices,
     cartesian
