@@ -142,7 +142,6 @@ function experimentInit() {
 
   stroop = new StroopTest({
     window: psychoJS.window,
-    stimuliFP: "materials/Stroop/BB.png"
   });
 
   anagrams = new Anagrams({
@@ -260,9 +259,16 @@ function blackAndRedSchulteTableRoutine(snapshot) {
 
 
 function stroopRoutine(snapshot) {
-  let stropAutoChangerId = setInterval(() => stroop.nextStimulus(), 1000);
+  let stropAutoChangerId = setInterval(() => stroop.nextStimulus(), 3000);
   return function () {
+    
     stroop.draw();
+
+    let answerKeys = psychoJS.eventManager.getKeys({ keyList: ['1', '2', '3', '4'], timeStamped: true });
+    if (answerKeys.length > 0) {
+      let [keyName, timePressed] = answerKeys[0];
+      let isCorrectAnswer = stroop.checkAnswer({ buttonPressedName: keyName });
+    }
 
     // check for quit (typically the Esc key)
     if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
