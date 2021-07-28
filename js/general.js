@@ -98,6 +98,15 @@ class Keyboard {
 }
 
 
+class Task {
+    constructor() {
+        if (this.constructor === Task) {
+            throw new Error("Abstract classes can't be instantiated.");
+        }
+    }
+}
+
+
 class ExperimentOrgaizer {
     constructor({
         psychoJS,
@@ -124,17 +133,17 @@ class ExperimentOrgaizer {
         // set up handler to look after randomisation of conditions etc
         let trials = new data.TrialHandler({
             psychoJS: this._psychoJS,
-            nReps: routineSettings.nLoops, 
+            nReps: routineSettings.nLoops,
             method: data.TrialHandler.Method.RANDOM,
             originPath: undefined,
             trialList: undefined,
-            seed: undefined, 
+            seed: undefined,
             name: 'testTrials',
-          });
+        });
 
-          this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
+        this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
 
-          for (const thisTrial of trials) {
+        for (const thisTrial of trials) {
             // console.count("trials");
             const snapshot = trials.getSnapshot();
             loopScheduler.add(routineSettings.routine());
@@ -143,8 +152,8 @@ class ExperimentOrgaizer {
             // trialsLoopScheduler.add(trialRoutineEachFrame(snapshot));
             // trialsLoopScheduler.add(trialRoutineEnd(snapshot));
             // trialsLoopScheduler.add(endLoopIteration(trialsLoopScheduler, snapshot));
-          }
-          return util.Scheduler.Event.NEXT;
+        }
+        return util.Scheduler.Event.NEXT;
     }
 
     _generateLoopEnd() {
@@ -214,6 +223,7 @@ export {
     ExperimentOrgaizer,
     Keyboard,
     SingleMouseClick,
+    Task,
     choice,
     choices,
     cartesian
