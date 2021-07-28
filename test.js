@@ -178,6 +178,7 @@ function experimentInit() {
   return Scheduler.Event.NEXT;
 }
 
+
 function developerMessage(snapshot) {
   let developerInstruction = new visual.TextStim({
     win: psychoJS.window,
@@ -256,6 +257,43 @@ function taskRoutineEnd(snapshot, task) {
 }
 
 
+function endLoopIteration(scheduler, snapshot) {
+  // ------Prepare for next entry------
+  return function () {
+    if (typeof snapshot !== 'undefined') {
+      // ------Check if user ended loop early------
+      if (snapshot.finished) {
+        // Check for and save orphaned data
+        if (psychoJS.experiment.isEntryEmpty()) {
+          psychoJS.experiment.nextEntry(snapshot);
+        }
+        scheduler.stop();
+      } else {
+        const thisTrial = snapshot.getCurrentTrial();
+        if (typeof thisTrial === 'undefined' || !('isTrials' in thisTrial) || thisTrial.isTrials) {
+          psychoJS.experiment.nextEntry(snapshot);
+        }
+      }
+      return Scheduler.Event.NEXT;
+    }
+  };
+}
+
+
+function quitPsychoJS(message, isCompleted) {
+  // Check for and save orphaned data
+  if (psychoJS.experiment.isEntryEmpty()) {
+    psychoJS.experiment.nextEntry();
+  }
+
+
+  psychoJS.window.close();
+  // psychoJS.quit({message: message, isCompleted: isCompleted});
+
+  return Scheduler.Event.QUIT;
+}
+
+
 function onlyBlackSchulteTableRoutine(snapshot) {
   return function () {
     onlyBlackSchulteTable.getClick(mouse);
@@ -288,6 +326,7 @@ function onlyBlackSchulteTableRoutine(snapshot) {
   };
 }
 
+
 function blackAndRedSchulteTableRoutine(snapshot) {
   return function () {
     blackAndRedSchulteTable.getClick(mouse);
@@ -319,7 +358,6 @@ function blackAndRedSchulteTableRoutine(snapshot) {
     return Scheduler.Event.FLIP_REPEAT;
   };
 }
-
 
 
 function stroopRoutine(snapshot) {
@@ -448,76 +486,4 @@ function digitSpanRoutine(snapshot) {
     return Scheduler.Event.FLIP_REPEAT;
   };
 
-}
-
-
-function endLoopIteration(scheduler, snapshot) {
-  // ------Prepare for next entry------
-  return function () {
-    if (typeof snapshot !== 'undefined') {
-      // ------Check if user ended loop early------
-      if (snapshot.finished) {
-        // Check for and save orphaned data
-        if (psychoJS.experiment.isEntryEmpty()) {
-          psychoJS.experiment.nextEntry(snapshot);
-        }
-        scheduler.stop();
-      } else {
-        const thisTrial = snapshot.getCurrentTrial();
-        if (typeof thisTrial === 'undefined' || !('isTrials' in thisTrial) || thisTrial.isTrials) {
-          psychoJS.experiment.nextEntry(snapshot);
-        }
-      }
-      return Scheduler.Event.NEXT;
-    }
-  };
-}
-
-
-function importConditions(currentLoop) {
-  return function () {
-    psychoJS.importAttributes(currentLoop.getCurrentTrial());
-    return Scheduler.Event.NEXT;
-  };
-}
-
-function trialsLoopBegin(trialsLoopScheduler) {
-  // set up handler to look after randomisation of conditions etc
-  let trials = new data.TrialHandler({
-    psychoJS: psychoJS,
-    nReps: 10, method: data.TrialHandler.Method.RANDOM,
-    extraInfo: expInfo, originPath: undefined,
-    trialList: undefined,
-    seed: undefined, name: 'trials'
-  });
-  console.log("HERE");
-  psychoJS.experiment.addLoop(trials); // add the loop to the experiment
-
-  let currentLoop = trials;  // we're now the current loop
-
-  // Schedule all the trials in the trialList:
-  for (const thisTrial of trials) {
-    const snapshot = trials.getSnapshot();
-    trialsLoopScheduler.add(importConditions(snapshot));
-    trialsLoopScheduler.add(trialRoutineBegin(snapshot));
-    trialsLoopScheduler.add(trialRoutineEachFrame(snapshot));
-    trialsLoopScheduler.add(trialRoutineEnd(snapshot));
-    trialsLoopScheduler.add(endLoopIteration(trialsLoopScheduler, snapshot));
-  }
-
-  return Scheduler.Event.NEXT;
-}
-
-
-function quitPsychoJS(message, isCompleted) {
-  // Check for and save orphaned data
-  if (psychoJS.experiment.isEntryEmpty()) {
-    psychoJS.experiment.nextEntry();
-  }
-
-
-  psychoJS.window.close();
-  // psychoJS.quit({message: message, isCompleted: isCompleted});
-
-  return Scheduler.Event.QUIT;
 }
