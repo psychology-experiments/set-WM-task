@@ -10,7 +10,7 @@ import * as visual from './lib/visual-2021.1.4.js';
 // import * as sound from './lib/sound-2021.1.4.js';
 import * as util from './lib/util-2021.1.4.js';
 
-import { ExperimentOrgaizer, Keyboard } from './js/general.js';
+import { ExperimentOrganizer, Keyboard } from './js/general.js';
 import { SchulteTable } from './js/schulte-table.js';
 import { StroopTest } from './js/stroop.js';
 import { Anagrams } from './js/anagrams.js';
@@ -158,7 +158,7 @@ function experimentInit() {
     "anagrams": { "routine": anagramsRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
   };
 
-  experimentSequence = new ExperimentOrgaizer({
+  experimentSequence = new ExperimentOrganizer({
     psychoJS: psychoJS,
     experimentScheduler: flowScheduler,
     parts: experimentParts,

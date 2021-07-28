@@ -107,7 +107,7 @@ class Task {
 }
 
 
-class ExperimentOrgaizer {
+class ExperimentOrganizer {
     constructor({
         psychoJS,
         experimentScheduler,
@@ -227,7 +227,7 @@ function sum(array) {
 
 
 export {
-    ExperimentOrgaizer,
+    ExperimentOrganizer,
     Keyboard,
     SingleMouseClick,
     Task,
