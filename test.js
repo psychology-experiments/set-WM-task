@@ -149,7 +149,7 @@ function experimentInit() {
 
   const experimentParts = {
     "developer message": { "routine": developerMessage, "instruction": null, "isForExperiment": false, nLoops: 0 },
-    "stroop": { task: stroop, instruction: null, isForExperiment: true, nLoops: [60, 60] },
+    "stroop": { task: stroop, instruction: stroop.instructions, isForExperiment: true, nLoops: [60, 60] },
     "luchins": { "routine": luchinsRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
     "dembo-rubinstein": { "routine": demboRubisteinRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
     "digit span": { "routine": digitSpanRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
