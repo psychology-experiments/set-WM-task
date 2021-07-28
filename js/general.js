@@ -202,7 +202,7 @@ function choice(seq) {
     let length = seq.length;
 
     if (length === 0) {
-        throw Error('Cannot choose from an empty sequence');
+        throw new Error('Cannot choose from an empty sequence');
     }
 
     let i = Math.floor(Math.random() * length);
