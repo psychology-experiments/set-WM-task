@@ -97,6 +97,7 @@ var anagrams;
 var luchins;
 var demboRubinstein;
 var digitSpan;
+var instructionPresenter;
 var globalClock;
 var routineClock;
 var mouse;
@@ -139,6 +140,13 @@ function experimentInit() {
     winnow: psychoJS.window,
   });
 
+  instructionPresenter = new visual.TextStim({
+    win: psychoJS.window,
+    height: 50,
+    wrapWidth: psychoJS.window.size[0] * 0.8,
+    color: new util.Color("black"),
+  });
+
   keyboard = new Keyboard({
     psychoJS: psychoJS,
   });
@@ -165,6 +173,7 @@ function experimentInit() {
     routines: {
       routines: [taskRoutineBegin, taskRoutineEachFrame, taskRoutineEnd],
       loop: endLoopIteration,
+      instruction: instructionRoutine,
     },
     tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
     isInDevelopment: true,
@@ -198,6 +207,15 @@ function developerMessage(snapshot) {
       return Scheduler.Event.NEXT;
     }
 
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+}
+
+
+function instructionRoutine(instructionText) {
+  instructionPresenter.text = instructionText;
+  return function () {
+    instructionPresenter.draw();
     return Scheduler.Event.FLIP_REPEAT;
   };
 }
