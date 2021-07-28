@@ -154,18 +154,12 @@ class ExperimentOrgaizer {
         this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
 
         for (const thisTrial of trials) {
-            // console.count("trials");
-            const snapshot = trials.getSnapshot();
 
-            for (const routine of taskRoutines) {
+            const snapshot = trials.getSnapshot();
+            for (const routine of taskRoutines.routines) {
                 loopScheduler.add(routine(snapshot, routineSettings.task));
             }
-            // loopScheduler.add(routineSettings.task());
-            // trialsLoopScheduler.add(importConditions(snapshot));
-            // trialsLoopScheduler.add(trialRoutineBegin(snapshot));
-            // trialsLoopScheduler.add(trialRoutineEachFrame(snapshot));
-            // trialsLoopScheduler.add(trialRoutineEnd(snapshot));
-            // trialsLoopScheduler.add(endLoopIteration(trialsLoopScheduler, snapshot));
+            loopScheduler.add(taskRoutines.loop(loopScheduler, snapshot));
         }
         return util.Scheduler.Event.NEXT;
     }
@@ -183,7 +177,7 @@ class ExperimentOrgaizer {
         const trialsLoopScheduler = new util.Scheduler(this._psychoJS);
         this._experimentScheduler.add(this._generateLoopBegin, trialsLoopScheduler, this._routines, routineSettings);
         this._experimentScheduler.add(trialsLoopScheduler);
-        this._experimentScheduler.add(this._generateLoopEnd, {});
+        this._experimentScheduler.add(this._generateLoopEnd);
     }
 
     generateExperimentSequence() {
@@ -196,7 +190,6 @@ class ExperimentOrgaizer {
 
 
         for (let [part, settings] of routines) {
-            const routines = this._routines;
             if (this._isLoopedRoutine(settings.nLoops)) {
                 this._generateLoopedRoutine(settings);
             } else {
