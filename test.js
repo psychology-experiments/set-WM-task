@@ -451,14 +451,6 @@ function digitSpanRoutine(snapshot) {
 }
 
 
-function DummyRoutine(snapshot) {
-  return function () {
-    return Scheduler.Event.NEXT;
-  };
-
-}
-
-
 function endLoopIteration(scheduler, snapshot) {
   // ------Prepare for next entry------
   return function () {
