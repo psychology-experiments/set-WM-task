@@ -162,7 +162,10 @@ function experimentInit() {
     psychoJS: psychoJS,
     experimentScheduler: flowScheduler,
     parts: experimentParts,
-    routines: [taskRoutineBegin, taskRoutineEachFrame, taskRoutineEnd],
+    routines: {
+      routines: [taskRoutineBegin, taskRoutineEachFrame, taskRoutineEnd],
+      loop: endLoopIteration,
+    },
     tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
     isInDevelopment: true,
     showOnly: "stroop",
@@ -237,7 +240,7 @@ function taskRoutineEachFrame(snapshot, task) {
 
     // Developer's option to look on different tasks
     if (experimentSequence.isInDevelopment && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
-      task.stop();
+      snapshot.finished = true;
       return Scheduler.Event.NEXT;
     }
 
