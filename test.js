@@ -4,13 +4,13 @@
 
 import { PsychoJS } from './lib/core-2021.1.4.js';
 import * as core from './lib/core-2021.1.4.js';
-// import { TrialHandler } from './lib/data-2021.1.4.js';
+// import * as data from './lib/data-2021.1.4.js';
 import { Scheduler } from './lib/util-2021.1.4.js';
 import * as visual from './lib/visual-2021.1.4.js';
 // import * as sound from './lib/sound-2021.1.4.js';
 import * as util from './lib/util-2021.1.4.js';
 
-import { ExperimentOrgaizer } from './js/general.js';
+import { ExperimentOrgaizer, Keyboard } from './js/general.js';
 import { SchulteTable } from './js/schulte-table.js';
 import { StroopTest } from './js/stroop.js';
 import { Anagrams } from './js/anagrams.js';
@@ -53,31 +53,9 @@ const dialogCancelScheduler = new Scheduler(psychoJS);
 
 psychoJS.scheduleCondition(function () { return true; }, flowScheduler, dialogCancelScheduler);
 
-
-let experimentParts = {
-  "developer message": { "routine": developerMessage, "instruction": null, "isForExperiment": false },
-  "stroop": { "routine": stroopRoutine, "instruction": null, "isForExperiment": true },
-  "luchins": { "routine": luchinsRoutine, "instruction": null, "isForExperiment": true },
-  "dembo-rubinstein": { "routine": demboRubisteinRoutine, "instruction": null, "isForExperiment": true },
-  "digit span": { "routine": digitSpanRoutine, "instruction": null, "isForExperiment": true },
-  "black schulte": { "routine": onlyBlackSchulteTableRoutine, "instruction": null, "isForExperiment": true },
-  "black and red schulte": { "routine": blackAndRedSchulteTableRoutine, "instruction": null, "isForExperiment": true },
-  "anagrams": { "routine": anagramsRoutine, "instruction": null, "isForExperiment": true },
-};
-
-const experimentSequence = new ExperimentOrgaizer({
-  scheduler: flowScheduler,
-  parts: experimentParts,
-  tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
-  isDeveloped: true,
-  showOnly: null,
-});
-
 // flowScheduler gets run if the participants presses OK
 flowScheduler.add(updateInfo); // add timeStamp
 flowScheduler.add(experimentInit);
-experimentSequence.generateExperimentSequence();
-flowScheduler.add(quitPsychoJS, '', true);
 
 // quit if user presses Cancel in dialog box:
 dialogCancelScheduler.add(quitPsychoJS, '', false);
@@ -112,7 +90,6 @@ function updateInfo() {
 }
 
 
-var trialClock;
 var onlyBlackSchulteTable;
 var blackAndRedSchulteTable;
 var stroop;
@@ -121,12 +98,13 @@ var luchins;
 var demboRubinstein;
 var digitSpan;
 var globalClock;
-var routineTimer;
+var routineClock;
 var mouse;
+var keyboard;
+var experimentSequence;
 // var testORA;
 function experimentInit() {
-  // Initialize components for Routine "trial"
-  trialClock = new util.Clock();
+  // Initialize components for WM tasks
 
   onlyBlackSchulteTable = new SchulteTable({
     window: psychoJS.window,
@@ -142,6 +120,7 @@ function experimentInit() {
 
   stroop = new StroopTest({
     window: psychoJS.window,
+    startTime: 0.1,
   });
 
   anagrams = new Anagrams({
@@ -160,13 +139,41 @@ function experimentInit() {
     winnow: psychoJS.window,
   });
 
+  keyboard = new Keyboard({
+    psychoJS: psychoJS,
+  });
+
   // testORA =
 
   mouse = new core.Mouse({ win: psychoJS.window });
 
+  const experimentParts = {
+    "developer message": { "routine": developerMessage, "instruction": null, "isForExperiment": false, nLoops: 0 },
+    "stroop": { task: stroop, instruction: null, isForExperiment: true, nLoops: [60, 60] },
+    "luchins": { "routine": luchinsRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+    "dembo-rubinstein": { "routine": demboRubisteinRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+    "digit span": { "routine": digitSpanRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+    "black schulte": { "routine": onlyBlackSchulteTableRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+    "black and red schulte": { "routine": blackAndRedSchulteTableRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+    "anagrams": { "routine": anagramsRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+  };
+
+  experimentSequence = new ExperimentOrgaizer({
+    psychoJS: psychoJS,
+    experimentScheduler: flowScheduler,
+    parts: experimentParts,
+    routines: [taskRoutineBegin, taskRoutineEachFrame, taskRoutineEnd],
+    tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
+    isInDevelopment: true,
+    showOnly: "stroop",
+  });
+
+  experimentSequence.generateExperimentSequence();
+  flowScheduler.add(quitPsychoJS, '', true);
+
   // Create some handy timers
   globalClock = new util.Clock();  // to track the time since experiment started
-  routineTimer = new util.CountdownTimer();  // to track time remaining of each (non-slip) routine
+  routineClock = new util.Clock();  // to track time remaining of each (non-slip) routine
 
   return Scheduler.Event.NEXT;
 }
@@ -188,6 +195,63 @@ function developerMessage(snapshot) {
     }
 
     return Scheduler.Event.FLIP_REPEAT;
+  };
+}
+
+
+function taskRoutineBegin(snapshot, task) {
+  return function () {
+    console.count("begin");
+    task.nextStimulus();
+    routineClock.reset();
+    return util.Scheduler.Event.NEXT;
+  };
+}
+
+
+function taskRoutineEachFrame(snapshot, task) {
+  let t;
+  return function () {
+    t = routineClock.getTime();
+
+    if (!task.isStarted && task.startTime <= t) {
+      task.start();
+    }
+
+    if (!keyboard.isInitilized && task.isStarted) {
+      keyboard.initilize();
+    }
+
+    if (keyboard.isInitilized) {
+      keyboard.getKeys({ KeyList: ['1', '2', '3', '4'] });
+      if (keyboard.isPressed) {
+        return Scheduler.Event.NEXT;
+      }
+    }
+
+    // check for quit (typically the Esc key)
+    if (psychoJS.experiment.experimentEnded || psychoJS.eventManager.getKeys({ keyList: ['escape'] }).length > 0) {
+      return quitPsychoJS('The [Escape] key was pressed. Goodbye!', false);
+    }
+
+    // Developer's option to look on different tasks
+    if (experimentSequence.isInDevelopment && psychoJS.eventManager.getKeys({ keyList: ['q'] }).length > 0) {
+      task.stop();
+      return Scheduler.Event.NEXT;
+    }
+
+
+    return Scheduler.Event.FLIP_REPEAT;
+  };
+}
+
+
+function taskRoutineEnd(snapshot, task) {
+  return function () {
+    let isCorrectAnswer = task.checkAnswer({ buttonPressedName: keyboard.keyName });
+    task.stop();
+    keyboard.stop();
+    return util.Scheduler.Event.NEXT;
   };
 }
 
@@ -259,15 +323,25 @@ function blackAndRedSchulteTableRoutine(snapshot) {
 
 
 function stroopRoutine(snapshot) {
-  let stropAutoChangerId = setInterval(() => stroop.nextStimulus(), 3000);
+  // let stropAutoChangerId = setInterval(() => stroop.nextStimulus(), 3000);
   return function () {
-    
+
     stroop.draw();
 
-    let answerKeys = psychoJS.eventManager.getKeys({ keyList: ['1', '2', '3', '4'], timeStamped: true });
-    if (answerKeys.length > 0) {
-      let [keyName, timePressed] = answerKeys[0];
-      let isCorrectAnswer = stroop.checkAnswer({ buttonPressedName: keyName });
+    if (!keyboard.isInitilized) {
+      keyboard.initilize();
+    }
+
+    if (keyboard.isInitilized) {
+      keyboard.getKeys({ KeyList: ['1', '2', '3', '4'] });
+      if (keyboard.isPressed) {
+        let isCorrectAnswer = stroop.checkAnswer({ buttonPressedName: keyboard.keyName });
+        console.log(isCorrectAnswer, keyboard.keyName, keyboard.rt);
+        stroop.nextStimulus();
+        keyboard.stop();
+        return Scheduler.Event.NEXT;
+      }
+
     }
 
     // check for quit (typically the Esc key)
@@ -413,6 +487,33 @@ function importConditions(currentLoop) {
     psychoJS.importAttributes(currentLoop.getCurrentTrial());
     return Scheduler.Event.NEXT;
   };
+}
+
+function trialsLoopBegin(trialsLoopScheduler) {
+  // set up handler to look after randomisation of conditions etc
+  let trials = new data.TrialHandler({
+    psychoJS: psychoJS,
+    nReps: 10, method: data.TrialHandler.Method.RANDOM,
+    extraInfo: expInfo, originPath: undefined,
+    trialList: undefined,
+    seed: undefined, name: 'trials'
+  });
+  console.log("HERE");
+  psychoJS.experiment.addLoop(trials); // add the loop to the experiment
+
+  let currentLoop = trials;  // we're now the current loop
+
+  // Schedule all the trials in the trialList:
+  for (const thisTrial of trials) {
+    const snapshot = trials.getSnapshot();
+    trialsLoopScheduler.add(importConditions(snapshot));
+    trialsLoopScheduler.add(trialRoutineBegin(snapshot));
+    trialsLoopScheduler.add(trialRoutineEachFrame(snapshot));
+    trialsLoopScheduler.add(trialRoutineEnd(snapshot));
+    trialsLoopScheduler.add(endLoopIteration(trialsLoopScheduler, snapshot));
+  }
+
+  return Scheduler.Event.NEXT;
 }
 
 

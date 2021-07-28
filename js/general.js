@@ -112,28 +112,38 @@ class ExperimentOrgaizer {
         psychoJS,
         experimentScheduler,
         parts,
+        routines,
         tasksAtTheBeginning,
-        isDeveloped,
+        isInDevelopment,
         showOnly,
     }) {
         this._psychoJS = psychoJS;
         this._experimentScheduler = experimentScheduler;
         this._parts = parts;
+        this._routines = routines;
         this._tasksAtTheBeginning = tasksAtTheBeginning;
 
-        this.isDeveloped = isDeveloped;
+        this.isInDevelopment = isInDevelopment;
         this._showOnly = showOnly;
     }
 
     _isToShowDelopment(settings) {
-        return settings.isForExperiment || this.isDeveloped;
+        return settings.isForExperiment || this.isInDevelopment;
     }
 
-    _generateLoopBegin(loopScheduler, routineSettings) {
+    _isShowOnlyOneTask(taskName) {
+        return this._showOnly === null || taskName === this._showOnly;
+    }
+
+    _isLoopedRoutine(nLoops) {
+        return sum(nLoops) > 0;
+    }
+
+    _generateLoopBegin(loopScheduler, taskRoutines, routineSettings) {
         // set up handler to look after randomisation of conditions etc
         let trials = new data.TrialHandler({
             psychoJS: this._psychoJS,
-            nReps: routineSettings.nLoops,
+            nReps: sum(routineSettings.nLoops),
             method: data.TrialHandler.Method.RANDOM,
             originPath: undefined,
             trialList: undefined,
@@ -146,7 +156,11 @@ class ExperimentOrgaizer {
         for (const thisTrial of trials) {
             // console.count("trials");
             const snapshot = trials.getSnapshot();
-            loopScheduler.add(routineSettings.routine());
+
+            for (const routine of taskRoutines) {
+                loopScheduler.add(routine(snapshot, routineSettings.task));
+            }
+            // loopScheduler.add(routineSettings.task());
             // trialsLoopScheduler.add(importConditions(snapshot));
             // trialsLoopScheduler.add(trialRoutineBegin(snapshot));
             // trialsLoopScheduler.add(trialRoutineEachFrame(snapshot));
@@ -162,32 +176,28 @@ class ExperimentOrgaizer {
     }
 
     _generateSingleRoutine(routineSettings) {
-        this._experimentScheduler.add(routineSettings.routine());
+        this._experimentScheduler.add(routineSettings.task());
     }
 
     _generateLoopedRoutine(routineSettings) {
         const trialsLoopScheduler = new util.Scheduler(this._psychoJS);
-        this._experimentScheduler.add(this._generateLoopBegin, trialsLoopScheduler, routineSettings);
+        this._experimentScheduler.add(this._generateLoopBegin, trialsLoopScheduler, this._routines, routineSettings);
         this._experimentScheduler.add(trialsLoopScheduler);
         this._experimentScheduler.add(this._generateLoopEnd, {});
     }
 
     generateExperimentSequence() {
-        if (this._showOnly !== null) {
-            let routineSettings = this._parts[this._showOnly];
-            if (routineSettings.nLoops > 0) {
-                this._generateLoopedRoutine(routineSettings);
-            } else {
-                this._generateSingleRoutine(routineSettings);
-            }
-            return;
+        if (this._parts === null) {
+            throw new Error("Experiment Parts are not defined");
         }
 
         let routines = Object.entries(this._parts)
-            .filter(([_, settings]) => this._isToShowDelopment(settings));
+            .filter(([part, settings]) => this._isShowOnlyOneTask(part) && this._isToShowDelopment(settings));
+
 
         for (let [part, settings] of routines) {
-            if (settings.nLoops > 0) {
+            const routines = this._routines;
+            if (this._isLoopedRoutine(settings.nLoops)) {
                 this._generateLoopedRoutine(settings);
             } else {
                 this._generateSingleRoutine(settings);
@@ -216,6 +226,10 @@ function choices(seq, k = 1) {
 
 function cartesian(...arrays) {
     return arrays.reduce((a, b) => a.flatMap(d => b.map(e => [d, e].flat())));
+}
+
+function sum(array) {
+    return array.reduce((total, current) => total + current, 0);
 }
 
 

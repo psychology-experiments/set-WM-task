@@ -1,7 +1,7 @@
 import * as visual from '../lib/visual-2021.1.4.js';
 import * as util from '../lib/util-2021.1.4.js';
 
-import { cartesian, choices } from "./general.js";
+import { Task, cartesian, choices } from "./general.js";
 
 
 const ALLOWED_SYMBOLS = {
@@ -56,11 +56,17 @@ class AnswerChecker {
         let correctProperty = wordName[this._property];
         let keyMeaning = KEYS_TO_ANSWERS[buttonPressedName];
         console.log(correctProperty, keyMeaning);
+        alert(`
+        В ${this._property + 1} части теста Струппа\n
+        Слово было ${ALLOWED_SYMBOLS[wordName[0]].word}\n
+        Его цвет был ${ALLOWED_SYMBOLS[wordName[1]].color}\n
+        Нажата была клавиша ${buttonPressedName} (${JSON.stringify(KEYS_TO_ANSWERS, null, 8)})\n
+        Что является ${correctProperty === keyMeaning} ответом`);
         return correctProperty === keyMeaning;
     }
 }
 
-class StroopTestPresenter {
+class StroopTestControler {
     constructor({ propertyToCheck }) {
         this._currentStimuli = null;
         this._answerChecker = new AnswerChecker({ wordPropertyToCheck: propertyToCheck });
@@ -110,13 +116,14 @@ class StroopTestPresenter {
 }
 
 class StroopTestView {
-    constructor({ window }) {
-        this._presenter = new StroopTestPresenter({ propertyToCheck: "text" });
+    constructor({ window, startTime }) {
+        this._presenter = new StroopTestControler({ propertyToCheck: "text" });
 
         this._currentStimulus = null;
+        this.startTime = startTime;
+        this.isStarted = false;
         this._words = {};
         this.createStimuli({ window });
-        this.nextStimulus();
     }
 
     createStimuli({ window }) {
@@ -135,12 +142,6 @@ class StroopTestView {
 
     nextStimulus() {
         let stimulusIdx = this._presenter.nextStimulus();
-
-        // for some reason PsychoJS do not remove stimulus from screen without that line
-        if (this._currentStimulus) {
-            this._currentStimulus.setAutoDraw(false);
-        }
-
         this._currentStimulus = this._words[stimulusIdx];
     }
 
@@ -148,12 +149,18 @@ class StroopTestView {
         return this._presenter.checkAnswer({ buttonPressedName });
     }
 
+    start() {
+        this.isStarted = true;
+        this.setAutoDraw(true);
+    }
+
     stop() {
+        this.isStarted = false;
         this._currentStimulus.setAutoDraw(false);
     }
 
-    draw() {
-        this._currentStimulus.draw();
+    setAutoDraw(toShow) {
+        this._currentStimulus.setAutoDraw(toShow);
     }
 }
 
