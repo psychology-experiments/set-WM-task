@@ -5,6 +5,7 @@ import * as util from '../lib/util-2021.1.4.js';
 
 class SingleMouseClick {
     constructor() {
+        super();
         this._isPressed = false;
         this._timePressed = null;
     }
@@ -43,6 +44,7 @@ class SingleMouseClick {
 
 class Keyboard {
     constructor({ psychoJS }) {
+        super();
         this._isInitialized = false;
         this._isPressed = false;
         this._keyName = null;
@@ -98,15 +100,6 @@ class Keyboard {
 }
 
 
-class Task {
-    constructor() {
-        if (this.constructor === Task) {
-            throw new Error("Abstract classes can't be instantiated.");
-        }
-    }
-}
-
-
 class InstructionGenerator {
     constructor({ showInstruction, when, instructionRoutine, instructionsText, loopScheduler }) {
         this._showInstruction = showInstruction;
@@ -117,7 +110,7 @@ class InstructionGenerator {
 
         this._instructions_qty = instructionsText.length;
         this._instructionIdx = 0;
-        
+
         if (this._instructions_qty !== this._when.length) {
             throw new Error("Quantity of instructions and loops are different");
         }
@@ -186,7 +179,7 @@ class ExperimentOrganizer {
             originPath: undefined,
             trialList: undefined,
             seed: undefined,
-            name: 'testTrials',
+            name: [routineSettings.task.name + "Trials"],
         });
 
         let instructionGenerator = new InstructionGenerator({
@@ -198,7 +191,7 @@ class ExperimentOrganizer {
         });
 
         this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
-    
+
         for (const thisTrial of trials) {
 
             const snapshot = trials.getSnapshot();
