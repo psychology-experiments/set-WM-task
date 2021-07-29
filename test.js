@@ -157,14 +157,14 @@ function experimentInit() {
   mouse = new core.Mouse({ win: psychoJS.window });
 
   const experimentParts = {
-    "developer message": { "routine": developerMessage, "isForExperiment": false, nLoops: 0 },
+    "developer message": { routine: developerMessage, isForExperiment: false, nLoops: 0 },
     "stroop": { task: stroop, userInputProcessor: keyboard, isForExperiment: true, nLoops: [60, 60] },
-    "luchins": { "routine": luchinsRoutine, "isForExperiment": true, nLoops: 0 },
-    "dembo-rubinstein": { "routine": demboRubisteinRoutine, "isForExperiment": true, nLoops: 0 },
-    "digit span": { "routine": digitSpanRoutine, "isForExperiment": true, nLoops: 0 },
-    "black schulte": { "routine": onlyBlackSchulteTableRoutine, "isForExperiment": true, nLoops: 0 },
-    "black and red schulte": { "routine": blackAndRedSchulteTableRoutine, "isForExperiment": true, nLoops: 0 },
-    "anagrams": { "routine": anagramsRoutine, "isForExperiment": true, nLoops: 0 },
+    "luchins": { task: luchins, userInputProcessor: null, isForExperiment: true, nLoops: [0] },
+    "dembo-rubinstein": { task: demboRubinstein, userInputProcessor: null, isForExperiment: true, nLoops: [0] },
+    "digit span": { task: digitSpan, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
+    "black schulte": { task: onlyBlackSchulteTable, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
+    "black and red schulte": { task: blackAndRedSchulteTable, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
+    "anagrams": { task: anagrams, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
   };
 
   experimentSequence = new ExperimentOrganizer({
