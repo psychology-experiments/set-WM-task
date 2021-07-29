@@ -3,7 +3,32 @@ import * as data from '../lib/data-2021.1.4.js';
 import * as util from '../lib/util-2021.1.4.js';
 
 
-class SingleMouseClick {
+class Task {
+    constructor() {
+        if (this.constructor === Task) {
+            throw new Error("Abstract classes can't be instantiated.");
+        }
+    }
+
+    getData() {
+        throw new Error("Method 'getData()' must be implemented.");
+    }
+}
+
+
+class UserInputProcessor {
+    constructor() {
+        if (this.constructor === UserInputProcessor) {
+            throw new Error("Abstract classes can't be instantiated.");
+        }
+    }
+
+    getData() {
+        throw new Error("Method 'getData()' must be implemented.");
+    }
+}
+
+class SingleMouseClick extends UserInputProcessor {
     constructor() {
         super();
         this._isPressed = false;
@@ -42,7 +67,7 @@ class SingleMouseClick {
     }
 }
 
-class Keyboard {
+class Keyboard extends UserInputProcessor {
     constructor({ psychoJS }) {
         super();
         this._isInitialized = false;
