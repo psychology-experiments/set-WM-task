@@ -107,6 +107,41 @@ class Task {
 }
 
 
+class InstructionGenerator {
+    constructor({ showInstruction, when, instructionRoutine, instructionsText, loopScheduler }) {
+        this._showInstruction = showInstruction;
+        this._when = when;
+        this._instructionsText = instructionsText;
+        this._instructionRoutine = instructionRoutine;
+        this._loopScheduler = loopScheduler;
+
+        this._instructions_qty = instructionsText.length;
+        this._instructionIdx = 0;
+        if (this._instructions_qty !== this._when.length) {
+            throw new Error("Quantity of instructions and loops are different");
+        }
+    }
+
+    generateInstruction(nTrial) {
+        if (!this._showInstruction) {
+            return;
+        }
+
+        if (this._instructions_qty === 0) {
+            return;
+        }
+
+        if (nTrial === this._when[this._instructionIdx] || nTrial === 0) {
+            this._loopScheduler.add(this._instructionRoutine(this._instructionsText[this._instructionIdx]));
+            this._instructions_qty -= 1;
+            this._instructionIdx += 1;
+        }
+    }
+
+
+}
+
+
 class ExperimentOrganizer {
     constructor({
         psychoJS,
@@ -116,6 +151,7 @@ class ExperimentOrganizer {
         tasksAtTheBeginning,
         isInDevelopment,
         showOnly,
+        showInstructions,
     }) {
         this._psychoJS = psychoJS;
         this._experimentScheduler = experimentScheduler;
@@ -125,6 +161,7 @@ class ExperimentOrganizer {
 
         this.isInDevelopment = isInDevelopment;
         this._showOnly = showOnly;
+        this._showInstructions = showInstructions;
     }
 
     _isToShowDelopment(settings) {
@@ -139,7 +176,7 @@ class ExperimentOrganizer {
         return sum(nLoops) > 0;
     }
 
-    _generateLoopBegin(loopScheduler, taskRoutines, routineSettings) {
+    _generateLoopBegin(loopScheduler, taskRoutines, routineSettings, showInstructions) {
         // set up handler to look after randomisation of conditions etc
         let trials = new data.TrialHandler({
             psychoJS: this._psychoJS,
@@ -151,11 +188,20 @@ class ExperimentOrganizer {
             name: 'testTrials',
         });
 
-        this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
+        let instructionGenerator = new InstructionGenerator({
+            showInstruction: showInstructions,
+            when: routineSettings.nLoops,
+            instructionRoutine: taskRoutines.instruction,
+            instructionsText: routineSettings.task.instructions,
+            loopScheduler: loopScheduler,
+        });
 
+        this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
+    
         for (const thisTrial of trials) {
 
             const snapshot = trials.getSnapshot();
+            instructionGenerator.generateInstruction(snapshot.thisN);
             for (const routine of taskRoutines.routines) {
                 loopScheduler.add(routine(snapshot, routineSettings.task));
             }
@@ -175,7 +221,7 @@ class ExperimentOrganizer {
 
     _generateLoopedRoutine(routineSettings) {
         const trialsLoopScheduler = new util.Scheduler(this._psychoJS);
-        this._experimentScheduler.add(this._generateLoopBegin, trialsLoopScheduler, this._routines, routineSettings);
+        this._experimentScheduler.add(this._generateLoopBegin, trialsLoopScheduler, this._routines, routineSettings, this._showInstructions);
         this._experimentScheduler.add(trialsLoopScheduler);
         this._experimentScheduler.add(this._generateLoopEnd);
     }

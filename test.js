@@ -156,14 +156,14 @@ function experimentInit() {
   mouse = new core.Mouse({ win: psychoJS.window });
 
   const experimentParts = {
-    "developer message": { "routine": developerMessage, "instruction": null, "isForExperiment": false, nLoops: 0 },
-    "stroop": { task: stroop, instruction: stroop.instructions, isForExperiment: true, nLoops: [60, 60] },
-    "luchins": { "routine": luchinsRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
-    "dembo-rubinstein": { "routine": demboRubisteinRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
-    "digit span": { "routine": digitSpanRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
-    "black schulte": { "routine": onlyBlackSchulteTableRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
-    "black and red schulte": { "routine": blackAndRedSchulteTableRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
-    "anagrams": { "routine": anagramsRoutine, "instruction": null, "isForExperiment": true, nLoops: 0 },
+    "developer message": { "routine": developerMessage, "isForExperiment": false, nLoops: 0 },
+    "stroop": { task: stroop, isForExperiment: true, nLoops: [60, 60] },
+    "luchins": { "routine": luchinsRoutine, "isForExperiment": true, nLoops: 0 },
+    "dembo-rubinstein": { "routine": demboRubisteinRoutine, "isForExperiment": true, nLoops: 0 },
+    "digit span": { "routine": digitSpanRoutine, "isForExperiment": true, nLoops: 0 },
+    "black schulte": { "routine": onlyBlackSchulteTableRoutine, "isForExperiment": true, nLoops: 0 },
+    "black and red schulte": { "routine": blackAndRedSchulteTableRoutine, "isForExperiment": true, nLoops: 0 },
+    "anagrams": { "routine": anagramsRoutine, "isForExperiment": true, nLoops: 0 },
   };
 
   experimentSequence = new ExperimentOrganizer({
@@ -178,6 +178,7 @@ function experimentInit() {
     tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
     isInDevelopment: true,
     showOnly: "stroop",
+    showInstructions: true,
   });
 
   experimentSequence.generateExperimentSequence();
@@ -214,8 +215,14 @@ function developerMessage(snapshot) {
 
 function instructionRoutine(instructionText) {
   instructionPresenter.text = instructionText;
+  instructionPresenter.setAutoDraw(true);
   return function () {
-    instructionPresenter.draw();
+
+    if (psychoJS.eventManager.getKeys({ keyList: ['right'] }).length > 0) {
+      instructionPresenter.setAutoDraw(false);
+      return Scheduler.Event.NEXT;
+    }
+
     return Scheduler.Event.FLIP_REPEAT;
   };
 }
