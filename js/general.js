@@ -11,7 +11,7 @@ class Task {
     }
 
     getData() {
-        throw new Error("Method 'getData()' must be implemented.");
+        throw new Error(`Method 'getData()' must be implemented in a ${task.name}.`);
     }
 }
 
@@ -24,13 +24,14 @@ class UserInputProcessor {
     }
 
     getData() {
-        throw new Error("Method 'getData()' must be implemented.");
+        throw new Error(`Method 'getData()' must be implemented in ${this.inputType}.`);
     }
 }
 
 class SingleMouseClick extends UserInputProcessor {
     constructor() {
         super();
+        this.inputType = "Mouse";
         this._isPressed = false;
         this._timePressed = null;
     }
@@ -70,6 +71,7 @@ class SingleMouseClick extends UserInputProcessor {
 class Keyboard extends UserInputProcessor {
     constructor({ psychoJS }) {
         super();
+        this.inputType = "Keyboard";
         this._isInitialized = false;
         this._isPressed = false;
         this._keyName = null;
@@ -111,6 +113,15 @@ class Keyboard extends UserInputProcessor {
             this._isPressed = true;
         }
 
+    }
+
+    getData() {
+        const inputData = {
+            keyName: this._keyName,
+            rt: this._rt,
+        };
+
+        return inputData;
     }
 
     stop() {
@@ -222,7 +233,7 @@ class ExperimentOrganizer {
             const snapshot = trials.getSnapshot();
             instructionGenerator.generateInstruction(snapshot.thisN);
             for (const routine of taskRoutines.routines) {
-                loopScheduler.add(routine(snapshot, routineSettings.task));
+                loopScheduler.add(routine(snapshot, routineSettings.task, routineSettings.userInputProcessor));
             }
             loopScheduler.add(taskRoutines.loop(loopScheduler, snapshot));
         }
