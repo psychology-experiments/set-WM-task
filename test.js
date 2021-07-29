@@ -146,6 +146,7 @@ function experimentInit() {
     wrapWidth: psychoJS.window.size[0] * 0.8,
     color: new util.Color("black"),
   });
+  instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
 
   keyboard = new Keyboard({
     psychoJS: psychoJS,
@@ -157,7 +158,7 @@ function experimentInit() {
 
   const experimentParts = {
     "developer message": { "routine": developerMessage, "isForExperiment": false, nLoops: 0 },
-    "stroop": { task: stroop, isForExperiment: true, nLoops: [60, 60] },
+    "stroop": { task: stroop, userInputProcessor: keyboard, isForExperiment: true, nLoops: [60, 60] },
     "luchins": { "routine": luchinsRoutine, "isForExperiment": true, nLoops: 0 },
     "dembo-rubinstein": { "routine": demboRubisteinRoutine, "isForExperiment": true, nLoops: 0 },
     "digit span": { "routine": digitSpanRoutine, "isForExperiment": true, nLoops: 0 },
@@ -186,7 +187,7 @@ function experimentInit() {
 
   // Create some handy timers
   globalClock = new util.Clock();  // to track the time since experiment started
-  routineClock = new util.Clock();  // to track time remaining of each (non-slip) routine
+  routineClock = new util.Clock();
 
   return Scheduler.Event.NEXT;
 }
@@ -214,12 +215,18 @@ function developerMessage(snapshot) {
 
 
 function instructionRoutine(instructionText) {
-  instructionPresenter.text = instructionText;
   return function () {
-    instructionPresenter.draw();
 
-    if (psychoJS.eventManager.getKeys({ keyList: ['right'] }).length > 0) {
+    if (instructionPresenter.status === PsychoJS.Status.NOT_STARTED) {
+      instructionPresenter.text = instructionText;
+      instructionPresenter.status = PsychoJS.Status.STARTED;
+      psychoJS.eventManager.clearEvents();
+      instructionPresenter.draw();
+    }
+
+    if (instructionPresenter.status === PsychoJS.Status.STARTED && psychoJS.eventManager.getKeys({ keyList: ['right'] }).length > 0) {
       instructionPresenter.setAutoDraw(false);
+      instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
       return Scheduler.Event.NEXT;
     }
 
@@ -228,7 +235,7 @@ function instructionRoutine(instructionText) {
 }
 
 
-function taskRoutineBegin(snapshot, task) {
+function taskRoutineBegin(snapshot, task, userInputProcessor) {
   return function () {
     console.count("begin");
     task.nextStimulus();
@@ -238,7 +245,7 @@ function taskRoutineBegin(snapshot, task) {
 }
 
 
-function taskRoutineEachFrame(snapshot, task) {
+function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
   let t;
   return function () {
     t = routineClock.getTime();
@@ -247,13 +254,13 @@ function taskRoutineEachFrame(snapshot, task) {
       task.start();
     }
 
-    if (!keyboard.isInitilized && task.isStarted) {
-      keyboard.initilize();
+    if (!userInputProcessor.isInitilized && task.isStarted) {
+      userInputProcessor.initilize();
     }
 
-    if (keyboard.isInitilized) {
-      keyboard.getKeys({ KeyList: ['1', '2', '3', '4'] });
-      if (keyboard.isPressed) {
+    if (userInputProcessor.isInitilized) {
+      userInputProcessor.getKeys({ KeyList: ['1', '2', '3', '4'] });
+      if (userInputProcessor.isPressed) {
         return Scheduler.Event.NEXT;
       }
     }
@@ -275,9 +282,13 @@ function taskRoutineEachFrame(snapshot, task) {
 }
 
 
-function taskRoutineEnd(snapshot, task) {
+function taskRoutineEnd(snapshot, task, userInputProcessor) {
   return function () {
-    let isCorrectAnswer = task.checkAnswer({ buttonPressedName: keyboard.keyName });
+    for (let [columnName, columnValue] of task.getData(userInputProcessor.getData())) {
+      psychoJS.experiment.addData(columnName, columnValue);
+    }
+
+    psychoJS.experiment.addData('timeFromExperimentStart', globalClock.getTime());
     task.stop();
     keyboard.stop();
     return util.Scheduler.Event.NEXT;
@@ -316,7 +327,7 @@ function quitPsychoJS(message, isCompleted) {
 
 
   psychoJS.window.close();
-  // psychoJS.quit({message: message, isCompleted: isCompleted});
+  psychoJS.quit({ message: message, isCompleted: isCompleted });
 
   return Scheduler.Event.QUIT;
 }
