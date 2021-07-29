@@ -76,23 +76,30 @@ class AnswerChecker {
     isCorrect({ wordName, buttonPressedName }) {
         let correctProperty = wordName[this._property];
         let keyMeaning = KEYS_TO_ANSWERS[buttonPressedName];
-        console.log(correctProperty, keyMeaning);
-        alert(`
-        В ${this._property + 1} части теста Струппа\n
-        Слово было ${ALLOWED_SYMBOLS[wordName[0]].word}\n
-        Его цвет был ${ALLOWED_SYMBOLS[wordName[1]].color}\n
-        Нажата была клавиша ${buttonPressedName} (${JSON.stringify(KEYS_TO_ANSWERS, null, 8)})\n
-        Что является ${correctProperty === keyMeaning} ответом`);
+        console.log(wordName, correctProperty, keyMeaning, correctProperty === keyMeaning);
+        // alert(`
+        // В ${this._property + 1} части теста Струппа\n
+        // Слово было ${ALLOWED_SYMBOLS[wordName[0]].word}\n
+        // Его цвет был ${ALLOWED_SYMBOLS[wordName[1]].color}\n
+        // Нажата была клавиша ${buttonPressedName} (${JSON.stringify(KEYS_TO_ANSWERS, null, 8)})\n
+        // Что является ${correctProperty === keyMeaning} ответом`);
         return correctProperty === keyMeaning;
     }
 }
 
 class StroopTestControler {
-    constructor({ propertyToCheck }) {
+    constructor() {
+        this._part = "color";
         this._currentStimuli = null;
-        this._answerChecker = new AnswerChecker({ wordPropertyToCheck: propertyToCheck });
+        this._answerCheckers = {
+            color: new AnswerChecker({ wordPropertyToCheck: "color" }),
+            text: new AnswerChecker({ wordPropertyToCheck: "text" }),
+        };
         this._words = this._createWords();
-        this._stimuli = this._generateStimili();
+        this._stimuli = {
+            color: this._generateStimili(),
+            text: this._generateStimili(),
+        };
     }
 
     _createWords() {
@@ -121,24 +128,27 @@ class StroopTestControler {
     }
 
     checkAnswer({ buttonPressedName }) {
-        return this._answerChecker.isCorrect({
+        return this._answerCheckers[this._part].isCorrect({
             wordName: this._currentStimuli.name,
             buttonPressedName: buttonPressedName,
         });
     }
 
     nextStimulus() {
-        if (this._stimuli.length === 0) {
-            throw Error("Stroop test was called to many times (more than 60).");
+        if (this._stimuli[this._part].length === 0) {
+            // throw Error("Stroop test was called to many times (more than 60).");
+            console.log("CHANGE");
+            this._part = "part2";
         }
-        this._currentStimuli = this._stimuli.pop();
+        this._currentStimuli = this._stimuli[this._part].pop();
         return this._currentStimuli.name;
     }
 }
 
 class StroopTestView {
     constructor({ window, startTime }) {
-        this._presenter = new StroopTestControler({ propertyToCheck: "text" });
+        this.name = "StroopTest";
+        this._presenter = new StroopTestControler();
 
         this._currentStimulus = null;
         this.startTime = startTime;
@@ -169,6 +179,10 @@ class StroopTestView {
 
     checkAnswer({ buttonPressedName }) {
         return this._presenter.checkAnswer({ buttonPressedName });
+    }
+
+    getData() {
+        
     }
 
     start() {
