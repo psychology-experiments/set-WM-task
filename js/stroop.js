@@ -76,13 +76,6 @@ class AnswerChecker {
     isCorrect({ wordName, buttonPressedName }) {
         let correctProperty = wordName[this._property];
         let keyMeaning = KEYS_TO_ANSWERS[buttonPressedName];
-        console.log(wordName, correctProperty, keyMeaning, correctProperty === keyMeaning);
-        // alert(`
-        // В ${this._property + 1} части теста Струппа\n
-        // Слово было ${ALLOWED_SYMBOLS[wordName[0]].word}\n
-        // Его цвет был ${ALLOWED_SYMBOLS[wordName[1]].color}\n
-        // Нажата была клавиша ${buttonPressedName} (${JSON.stringify(KEYS_TO_ANSWERS, null, 8)})\n
-        // Что является ${correctProperty === keyMeaning} ответом`);
         return correctProperty === keyMeaning;
     }
 }
@@ -137,16 +130,32 @@ class StroopTestControler {
     nextStimulus() {
         if (this._stimuli[this._part].length === 0) {
             // throw Error("Stroop test was called to many times (more than 60).");
-            console.log("CHANGE");
-            this._part = "part2";
+            this._part = "text";
         }
         this._currentStimuli = this._stimuli[this._part].pop();
         return this._currentStimuli.name;
     }
+
+    getData(name, userInputData) {
+        let isCorrectAnswer = this.checkAnswer({ buttonPressedName: userInputData.keyName }) ? 1 : 0;
+
+        const taskData = {
+            task: name,
+            word: this._currentStimuli.text,
+            color: this._currentStimuli.color,
+            part: this._part,
+            buttonPressedName: userInputData.keyName,
+            isCorrect: isCorrectAnswer,
+            rt: userInputData.rt,
+        };
+
+        return Object.entries(taskData);
+    }
 }
 
-class StroopTestView {
+class StroopTestView extends Task {
     constructor({ window, startTime }) {
+        super();
         this.name = "StroopTest";
         this._presenter = new StroopTestControler();
 
@@ -181,8 +190,8 @@ class StroopTestView {
         return this._presenter.checkAnswer({ buttonPressedName });
     }
 
-    getData() {
-        
+    getData(userInputData) {
+        return this._presenter.getData(this.name, userInputData);
     }
 
     start() {
