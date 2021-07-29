@@ -117,6 +117,7 @@ class InstructionGenerator {
 
         this._instructions_qty = instructionsText.length;
         this._instructionIdx = 0;
+        
         if (this._instructions_qty !== this._when.length) {
             throw new Error("Quantity of instructions and loops are different");
         }

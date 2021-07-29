@@ -215,8 +215,8 @@ function developerMessage(snapshot) {
 
 function instructionRoutine(instructionText) {
   instructionPresenter.text = instructionText;
-  instructionPresenter.setAutoDraw(true);
   return function () {
+    instructionPresenter.draw();
 
     if (psychoJS.eventManager.getKeys({ keyList: ['right'] }).length > 0) {
       instructionPresenter.setAutoDraw(false);
