@@ -10,8 +10,24 @@ class Task {
         }
     }
 
+    start() {
+        throw new Error(`Method 'start()' must be implemented in a ${task.name}.`);
+    }
+
+    stop() {
+        throw new Error(`Method 'stop()' must be implemented in a ${task.name}.`);
+    }
+
     getData() {
         throw new Error(`Method 'getData()' must be implemented in a ${task.name}.`);
+    }
+
+    setAutoDraw(toShow) {
+        throw new Error(`Method 'setAutoDraw(toShow)' must be implemented in a ${task.name}.`);
+    }
+
+    nextStimulus() {
+        throw new Error(`Method 'nextStimulus()' must be implemented in a ${task.name}.`);
     }
 }
 
