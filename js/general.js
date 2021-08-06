@@ -339,6 +339,7 @@ class WordInputProcessor extends UserInputProcessor {
         this._maxLength = taskConditions.maxInputLength;
         this._inputWindow.setAutoDraw(true);
         this._isInitilized = true;
+        this._inputWindow.refresh();
     }
 
     stop() {
