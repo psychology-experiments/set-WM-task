@@ -161,14 +161,28 @@ class StroopTestPresenter extends TaskPresenter {
         this._trial_finished = true;
     }
 
+
     nextStimulus() {
         if (this._stimuli[this._part].length === 0) {
             // throw Error("Stroop test was called to many times (more than 60).");
             this._part = "text";
         }
+
+        if (this._stimuli[this._part].length === 60) {
+            this._view.showHint(true);
+        }
+
         this._currentStimuli = this._stimuli[this._part].pop();
         this._view.setStroopWord(this._currentStimuli.name);
         this._trial_finished = false;
+    }
+
+    stop() {
+        super.stop();
+        
+        if (this._stimuli[this._part].length === 0) {
+            this._view.showHint(false);
+        }
     }
 
     isTrialFinished() {
@@ -191,6 +205,26 @@ class StroopTestView extends TaskView {
 
         this._currentStimulus = null;
         this._words = {};
+
+        const hintLetterSize = 50;
+
+        this._stroopHint = new visual.TextStim({
+            win: window,
+            text: this._generateHintText(),
+            color: "black",
+            height: hintLetterSize,
+            pos: [0, window.size[1] * 0.5 - hintLetterSize * 2],
+            autoDraw: false,
+            bold: true,
+            wrapWidth: window.size[0] * 0.8,
+        });
+    }
+
+    _generateHintText() {
+        // const colors = ["красный", "жёлтый", "зелёный", "синий"];
+        const spaceSeparator = "\t".repeat(13);
+        const hintText = `красный жёлтый зелёный синий\n1${spaceSeparator}2${spaceSeparator}3${spaceSeparator}4`;
+        return hintText;
     }
 
     createStimuli({ window, stimuliInfo }) {
@@ -209,6 +243,10 @@ class StroopTestView extends TaskView {
 
     setStroopWord(stroopWordName) {
         this._currentStimulus = this._words[stroopWordName];
+    }
+
+    showHint(toShow) {
+        this._stroopHint.setAutoDraw(toShow);
     }
 
     setAutoDraw(toShow) {
