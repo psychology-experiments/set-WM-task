@@ -10,7 +10,7 @@ import * as visual from './lib/visual-2021.1.4.js';
 // import * as sound from './lib/sound-2021.1.4.js';
 import * as util from './lib/util-2021.1.4.js';
 
-import { ExperimentOrganizer, Keyboard } from './js/general.js';
+import * as general from './js/general.js';
 import { SchulteTable } from './js/schulte-table.js';
 import { StroopTest } from './js/stroop.js';
 import { Anagrams } from './js/anagrams.js';
@@ -102,6 +102,9 @@ var globalClock;
 var routineClock;
 var mouse;
 var keyboard;
+var wordInputProcessor;
+var additionalDataHandler;
+var dataSaver;
 var experimentSequence;
 // var testORA;
 function experimentInit() {
@@ -125,19 +128,20 @@ function experimentInit() {
   });
 
   anagrams = new Anagrams({
-    winnow: psychoJS.window,
+    window: psychoJS.window,
+    startTime: 0.1,
   });
 
   luchins = new Luchins({
-    winnow: psychoJS.window,
+    window: psychoJS.window,
   });
 
   demboRubinstein = new DemboRubinstein({
-    winnow: psychoJS.window,
+    window: psychoJS.window,
   });
 
   digitSpan = new DigitSpan({
-    winnow: psychoJS.window,
+    window: psychoJS.window,
   });
 
   instructionPresenter = new visual.TextStim({
@@ -148,13 +152,33 @@ function experimentInit() {
   });
   instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
 
-  keyboard = new Keyboard({
-    psychoJS: psychoJS,
-  });
+  // Create some handy timers
+  globalClock = new util.Clock();  // to track the time since experiment started
+  routineClock = new util.Clock();
 
-  // testORA =
+  additionalDataHandler = new general.AdditionalTrialData(
+    {
+      routineTime: () => routineClock.getTime(),
+      timeFromExperimentStart: () => globalClock.getTime(),
+    }
+
+  );
 
   mouse = new core.Mouse({ win: psychoJS.window });
+
+  keyboard = new general.SingleSymbolKeyboard({
+    psychoJS: psychoJS,
+    additionalTrialData: additionalDataHandler,
+  });
+
+  wordInputProcessor = new general.WordInputProcessor({
+    window: psychoJS.window,
+    additionalTrialData: additionalDataHandler,
+  });
+
+  dataSaver = new general.DataSaver({
+    psychoJS: psychoJS,
+  });
 
   const experimentParts = {
     "developer message": { routine: developerMessage, isForExperiment: false, nLoops: 0 },
@@ -164,10 +188,10 @@ function experimentInit() {
     "digit span": { task: digitSpan, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
     "black schulte": { task: onlyBlackSchulteTable, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
     "black and red schulte": { task: blackAndRedSchulteTable, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
-    "anagrams": { task: anagrams, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
+    "anagrams": { task: anagrams, userInputProcessor: wordInputProcessor, "isForExperiment": true, nLoops: [10] },
   };
 
-  experimentSequence = new ExperimentOrganizer({
+  experimentSequence = new general.ExperimentOrganizer({
     psychoJS: psychoJS,
     experimentScheduler: flowScheduler,
     parts: experimentParts,
@@ -178,16 +202,12 @@ function experimentInit() {
     },
     tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
     isInDevelopment: true,
-    showOnly: "stroop",
+    showOnly: "anagrams",
     showInstructions: true,
   });
 
   experimentSequence.generateExperimentSequence();
   flowScheduler.add(quitPsychoJS, '', true);
-
-  // Create some handy timers
-  globalClock = new util.Clock();  // to track the time since experiment started
-  routineClock = new util.Clock();
 
   return Scheduler.Event.NEXT;
 }
@@ -255,14 +275,17 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
     }
 
     if (!userInputProcessor.isInitilized && task.isStarted) {
-      userInputProcessor.initilize();
+      userInputProcessor.initilize(task.getTaskConditions());
     }
 
-    if (userInputProcessor.isInitilized) {
-      userInputProcessor.getKeys({ KeyList: ['1', '2', '3', '4'] });
-      if (userInputProcessor.isPressed) {
-        return Scheduler.Event.NEXT;
-      }
+    if (userInputProcessor.isInitilized && userInputProcessor.isSendInput()) {
+      task.checkInput(userInputProcessor);
+    }
+
+    if (task.isTrialFinished()) {
+      console.log("trial finished");
+      task.addUnfinishedTrialData(userInputProcessor);
+      return Scheduler.Event.NEXT;
     }
 
     // check for quit (typically the Esc key)
@@ -284,13 +307,16 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
 
 function taskRoutineEnd(snapshot, task, userInputProcessor) {
   return function () {
-    for (let [columnName, columnValue] of task.getData(userInputProcessor.getData())) {
-      psychoJS.experiment.addData(columnName, columnValue);
+    dataSaver.saveData({ taskData: task.getTrialData() });
+
+    task.stop();
+    userInputProcessor.stop();
+
+    if (task.isTaskFinished()) {
+      console.log("task finished");
+      snapshot.finished = true;
     }
 
-    psychoJS.experiment.addData('timeFromExperimentStart', globalClock.getTime());
-    task.stop();
-    keyboard.stop();
     return util.Scheduler.Event.NEXT;
   };
 }
@@ -303,14 +329,14 @@ function endLoopIteration(scheduler, snapshot) {
       // ------Check if user ended loop early------
       if (snapshot.finished) {
         // Check for and save orphaned data
-        if (psychoJS.experiment.isEntryEmpty()) {
-          psychoJS.experiment.nextEntry(snapshot);
-        }
+        // if (psychoJS.experiment.isEntryEmpty()) {
+        //   psychoJS.experiment.nextEntry(snapshot);
+        // }
         scheduler.stop();
       } else {
         const thisTrial = snapshot.getCurrentTrial();
         if (typeof thisTrial === 'undefined' || !('isTrials' in thisTrial) || thisTrial.isTrials) {
-          psychoJS.experiment.nextEntry(snapshot);
+          // psychoJS.experiment.nextEntry(snapshot);
         }
       }
       return Scheduler.Event.NEXT;

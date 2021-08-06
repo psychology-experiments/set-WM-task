@@ -1,7 +1,7 @@
 import * as visual from '../lib/visual-2021.1.4.js';
 import * as util from '../lib/util-2021.1.4.js';
 
-import { Task, cartesian, choices } from "./general.js";
+import { TaskPresenter, TaskView, cartesian, choices } from "./general.js";
 
 
 const ALLOWED_SYMBOLS = {
@@ -153,10 +153,9 @@ class StroopTestControler {
     }
 }
 
-class StroopTestView extends Task {
+class StroopTestView {
     constructor({ window, startTime }) {
-        super();
-        this.name = "StroopTest";
+        // super({ name: "StroopTest" });
         this._presenter = new StroopTestControler();
 
         this._currentStimulus = null;
@@ -208,6 +207,7 @@ class StroopTestView extends Task {
         this._currentStimulus.setAutoDraw(toShow);
     }
 }
+
 
 
 export { StroopTestView as StroopTest };

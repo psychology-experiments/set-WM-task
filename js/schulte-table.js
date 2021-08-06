@@ -159,7 +159,7 @@ class SchulteTable {
         this.status = undefined;
         this.squaresNumber = squaresNumber;
 
-        this._singleClick = new SingleMouseClick();
+        // this._singleClick = new SingleMouseClick();
         this._progress = new SchulteProgress({ type: numberColor });
         this._squares = [];
         this._generateSquares(window, side, numberColor);
