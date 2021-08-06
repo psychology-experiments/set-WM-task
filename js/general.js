@@ -55,7 +55,10 @@ class TaskPresenter {
     }
 
     addUnfinishedTrialData(userInputProcessor) {
-        throw new Error(`Method 'addUnfinishedTrialData(userInputProcessor)' must be implemented in ${this.name} class.`);
+        if (this._trial_finished) {
+            return;
+        }
+        // throw new Error(`Method 'addUnfinishedTrialData(userInputProcessor)' must be implemented in ${this.name} class.`);
     }
 
     getTrialData() {
@@ -225,9 +228,9 @@ class SingleMouseClick extends UserInputProcessor {
 }
 
 class SingleSymbolKeyboard extends UserInputProcessor {
-    constructor({ psychoJS, keysToWatch, additionalTrialData }) {
+    constructor({ psychoJS, additionalTrialData }) {
         super({ inputType: "Keyboard", additionalTrialData });
-        this._keyList = keysToWatch;
+        this._keyList = null;
         this._isPressed = false;
         this._keyName = null;
         this._rt = null;
@@ -244,23 +247,19 @@ class SingleSymbolKeyboard extends UserInputProcessor {
         return this._keyName;
     }
 
-    get isInitilized() {
-        return this._isInitialized;
-    }
-
     get isPressed() {
         return this._isPressed;
     }
 
-    initilize() {
+    initilize(taskConditions) {
+        this._keyList = taskConditions.keysToWatch;
         this._isInitilized = true;
         this._psychoJS.window.callOnFlip(() => this._keyboard.clock.reset());  // t === 0 on next screen flip
         this._psychoJS.window.callOnFlip(() => this._keyboard.start()); // start on screen flip
         this._psychoJS.window.callOnFlip(() => this._keyboard.clearEvents()); // remove all previous events
     }
 
-
-    getInput() {
+    isSendInput() {
         let pressedKey = this._keyboard.getKeys({ keyList: this._keyList, waitRelease: false });
 
         if (pressedKey.length > 0) {
@@ -268,10 +267,8 @@ class SingleSymbolKeyboard extends UserInputProcessor {
             this._rt = pressedKey[0].rt;
             this._isPressed = true;
         }
-    }
 
-    isSendInput() {
-
+        return this._isPressed;
     }
 
     getData() {
@@ -285,7 +282,8 @@ class SingleSymbolKeyboard extends UserInputProcessor {
 
     stop() {
         this._keyboard.stop();
-        this._isInitialized = false;
+        this._keyList = null;
+        this._isInitilized = false;
         this._isPressed = false;
         this._keyName = null;
         this._rt = null;
@@ -637,6 +635,7 @@ class AdditionalTrialData {
     }
 
     addData(trialData) {
+        // TODO: time data is added after routine is ended. Let's try to make it nearer to actual time point (generate in main for example)
         const additionalData = this._generateAdditionalData();
         this._checkNoDataOverwritten(trialData, additionalData);
 

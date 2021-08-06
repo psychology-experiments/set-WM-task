@@ -202,7 +202,7 @@ function experimentInit() {
     },
     tasksAtTheBeginning: ["developer message", "black schulte", "black and red schulte"],
     isInDevelopment: true,
-    showOnly: "anagrams",
+    showOnly: "stroop",
     showInstructions: true,
   });
 

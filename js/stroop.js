@@ -1,7 +1,7 @@
 import * as visual from '../lib/visual-2021.1.4.js';
 import * as util from '../lib/util-2021.1.4.js';
 
-import { TaskPresenter, TaskView, cartesian, choices } from "./general.js";
+import { TaskPresenter, TaskView, Instruction, cartesian, choices } from "./general.js";
 
 
 const ALLOWED_SYMBOLS = {
@@ -28,7 +28,7 @@ const firstPartInstruction = `
 Если слово окрашено в ЗЕЛЕНЫЙ цвет, нажми «3»
 Если слово окрашено в СИНИЙ цвет, нажми «4»
 Постарайся выполнять задание как можно быстрее и точнее!
-Если готов, нажми СТРЕЛКУ ВПРАВО`.trim();
+Если готов, нажми СТРЕЛКУ ВПРАВО`;
 
 
 const secondPartInstruction = `
@@ -39,7 +39,7 @@ const secondPartInstruction = `
 Если написан ЗЕЛЕНЫЙ цвет, нажми «3»
 Если написан СИНИЙ цвет, нажми «4»
 Постарайся выполнять задание как можно быстрее и точнее!
-Если готов, нажми СТРЕЛКУ ВПРАВО`.trim();
+Если готов, нажми СТРЕЛКУ ВПРАВО`;
 
 
 class StroopWord {
@@ -76,23 +76,35 @@ class AnswerChecker {
     isCorrect({ wordName, buttonPressedName }) {
         let correctProperty = wordName[this._property];
         let keyMeaning = KEYS_TO_ANSWERS[buttonPressedName];
-        return correctProperty === keyMeaning;
+        return correctProperty === keyMeaning ? 1 : 0;
     }
 }
 
-class StroopTestControler {
-    constructor() {
+class StroopTestPresenter extends TaskPresenter {
+    constructor({ window, startTime }) {
+        const instructions = [
+            new Instruction(firstPartInstruction),
+            new Instruction(secondPartInstruction)
+        ];
+        const view = new StroopTestView({ window, startTime });
+        super({ name: "StroopTest", instructionsText: instructions, view: view });
+
         this._part = "color";
         this._currentStimuli = null;
+
         this._answerCheckers = {
             color: new AnswerChecker({ wordPropertyToCheck: "color" }),
             text: new AnswerChecker({ wordPropertyToCheck: "text" }),
         };
+
         this._words = this._createWords();
+
         this._stimuli = {
-            color: this._generateStimili(),
-            text: this._generateStimili(),
+            color: this._generateStimiliSet(),
+            text: this._generateStimiliSet(),
         };
+
+        this._view.createStimuli({ window: window, stimuliInfo: this._getStimuliInfo() });
     }
 
     _createWords() {
@@ -105,14 +117,14 @@ class StroopTestControler {
         return words;
     }
 
-    _generateStimili() {
+    _generateStimiliSet() {
         let congruentSet = choices(this._words.congruent, 10);
         let inCongruentSet = choices(this._words.incongruent, 50);
         let wordsSet = congruentSet.concat(inCongruentSet);
         return util.shuffle(wordsSet);
     }
 
-    * getStimuliInfo() {
+    * _getStimuliInfo() {
         for (let wordType of Object.values(this._words)) {
             for (let wordInfo of wordType) {
                 yield wordInfo;
@@ -120,11 +132,33 @@ class StroopTestControler {
         }
     }
 
-    checkAnswer({ buttonPressedName }) {
+    getTaskConditions() {
+        return { keysToWatch: ["1", "2", "3", "4"] };
+    }
+
+    _checkAnswer({ buttonPressedName }) {
         return this._answerCheckers[this._part].isCorrect({
             wordName: this._currentStimuli.name,
             buttonPressedName: buttonPressedName,
         });
+    }
+
+    checkInput(userInputProcessor) {
+        const inputData = userInputProcessor.getData();
+        const isCorrectAnswer = this._checkAnswer({ buttonPressedName: inputData.keyName });
+
+        let attemptData = {
+            task: this.name,
+            word: this._currentStimuli.text,
+            color: this._currentStimuli.color,
+            part: this._part,
+            isCorrect: isCorrectAnswer,
+            solved: 1,
+        };
+        attemptData = Object.assign(attemptData, inputData);
+
+        this._solutionAttemptsKeeper.saveAttempt(attemptData);
+        this._trial_finished = true;
     }
 
     nextStimulus() {
@@ -133,41 +167,34 @@ class StroopTestControler {
             this._part = "text";
         }
         this._currentStimuli = this._stimuli[this._part].pop();
-        return this._currentStimuli.name;
+        this._view.setStroopWord(this._currentStimuli.name);
+        this._trial_finished = false;
     }
 
-    getData(name, userInputData) {
-        let isCorrectAnswer = this.checkAnswer({ buttonPressedName: userInputData.keyName }) ? 1 : 0;
+    isTrialFinished() {
+        return this._trial_finished;
+    }
 
-        const taskData = {
-            task: name,
-            word: this._currentStimuli.text,
-            color: this._currentStimuli.color,
-            part: this._part,
-            buttonPressedName: userInputData.keyName,
-            isCorrect: isCorrectAnswer,
-            rt: userInputData.rt,
-        };
+    addUnfinishedTrialData(userInputProcessor) {
+        // StroopTest can not be UNfinished thus nothing shold be done here
+        return;
+    }
 
-        return Object.entries(taskData);
+    isTaskFinished() {
+        return this._stimuli.color.length === 0 && this._stimuli.text.length === 0;
     }
 }
 
-class StroopTestView {
+class StroopTestView extends TaskView {
     constructor({ window, startTime }) {
-        // super({ name: "StroopTest" });
-        this._presenter = new StroopTestControler();
+        super({ startTime });
 
         this._currentStimulus = null;
-        this.startTime = startTime;
-        this.isStarted = false;
-        this.instructions = [firstPartInstruction, secondPartInstruction];
         this._words = {};
-        this.createStimuli({ window });
     }
 
-    createStimuli({ window }) {
-        for (let stimulusInfo of this._presenter.getStimuliInfo()) {
+    createStimuli({ window, stimuliInfo }) {
+        for (let stimulusInfo of stimuliInfo) {
             const wordStimulus = new visual.TextStim({
                 win: window,
                 text: stimulusInfo.text,
@@ -180,27 +207,8 @@ class StroopTestView {
         }
     }
 
-    nextStimulus() {
-        let stimulusIdx = this._presenter.nextStimulus();
-        this._currentStimulus = this._words[stimulusIdx];
-    }
-
-    checkAnswer({ buttonPressedName }) {
-        return this._presenter.checkAnswer({ buttonPressedName });
-    }
-
-    getData(userInputData) {
-        return this._presenter.getData(this.name, userInputData);
-    }
-
-    start() {
-        this.isStarted = true;
-        this.setAutoDraw(true);
-    }
-
-    stop() {
-        this.isStarted = false;
-        this._currentStimulus.setAutoDraw(false);
+    setStroopWord(stroopWordName) {
+        this._currentStimulus = this._words[stroopWordName];
     }
 
     setAutoDraw(toShow) {
@@ -210,4 +218,4 @@ class StroopTestView {
 
 
 
-export { StroopTestView as StroopTest };
+export { StroopTestPresenter as StroopTest };
