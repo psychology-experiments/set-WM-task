@@ -79,6 +79,11 @@ class AnagramsPresenter extends TaskPresenter {
             rightAnswer: this._currentStimulus.answer,
             isCorrect: isCorrectAnswer ? 1 : 0,
         };
+
+        if (isCorrectAnswer) {
+            attemptData.solved = 1;
+        }
+
         attemptData = Object.assign(attemptData, inputData);
 
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
