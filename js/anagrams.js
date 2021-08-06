@@ -88,6 +88,10 @@ class AnagramsPresenter extends TaskPresenter {
     }
 
     addUnfinishedTrialData(userInputProcessor) {
+        if (this._trial_finished) {
+            return;
+        }
+
         const inputData = userInputProcessor.getData();
 
         let attemptData = {
