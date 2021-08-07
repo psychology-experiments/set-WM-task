@@ -190,7 +190,7 @@ class UserInputProcessor {
 
 class SingleMouseClick extends UserInputProcessor {
     constructor(additionalTrialData) {
-        super({ inputType: "Mouse", additionalTrialData });
+        super({ inputType: "SingleMouseClick", additionalTrialData });
         this._isPressed = false;
         this._timePressed = null;
     }
@@ -229,7 +229,7 @@ class SingleMouseClick extends UserInputProcessor {
 
 class SingleSymbolKeyboard extends UserInputProcessor {
     constructor({ psychoJS, additionalTrialData }) {
-        super({ inputType: "Keyboard", additionalTrialData });
+        super({ inputType: "SingleSymbolKeyboard", additionalTrialData });
         this._keyList = null;
         this._isPressed = false;
         this._keyName = null;
@@ -291,11 +291,47 @@ class SingleSymbolKeyboard extends UserInputProcessor {
 }
 
 
+class SliderInput extends UserInputProcessor {
+    constructor({ psychoJS, additionalTrialData }) {
+        super({ inputType: "SliderInput", additionalTrialData });
+        this._psychoJS = psychoJS;
+    }
+
+    initilize(taskConditions) {
+        throw new Error(`Method 'initilize(taskConditions)' must be implemented in ${this.inputType}.`);
+    }
+
+    stop() {
+        throw new Error(`Method 'stop()' must be implemented in ${this.inputType}.`);
+    }
+
+    isSendInput() {
+        throw new Error(`Method 'isSendInput()' must be implemented in ${this.inputType}.`);
+    }
+
+    getInput() {
+        throw new Error(`Method 'getInput()' must be implemented in ${this.inputType}.`);
+    }
+
+    getData() {
+        throw new Error(`Method 'getData()' must be implemented in ${this.inputType}.`);
+    }
+
+    showInputError() {
+        throw new Error(`Method 'showInputError()' must be implemented in ${this.inputType}.`);
+    }
+
+    clearInput() {
+        throw new Error(`Method 'clearInput()' must be implemented in ${this.inputType}.`);
+    }
+}
+
+
 class WordInputProcessor extends UserInputProcessor {
-    constructor({ window, additionalTrialData }) {
+    constructor({ psychoJS, additionalTrialData }) {
         super({ inputType: "WordInputProcessor", additionalTrialData });
         this._inputWindow = new visual.TextBox({
-            win: window,
+            win: psychoJS.window,
             name: 'textbox',
             text: '',
             font: 'Open Sans',
@@ -319,7 +355,7 @@ class WordInputProcessor extends UserInputProcessor {
         });
 
         this._errorMessage = new visual.TextStim({
-            win: window,
+            win: psychoJS.window,
             color: "red",
         });
 
@@ -679,6 +715,7 @@ export {
     SolutionAttemptsKeeper,
     WordInputProcessor,
     SingleMouseClick,
+    SliderInput,
     TaskPresenter,
     TaskView,
     choice,
