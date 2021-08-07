@@ -190,7 +190,7 @@ function experimentInit() {
     "developer message": { routine: developerMessage, isForExperiment: false, nLoops: 0 },
     "stroop": { task: stroop, userInputProcessor: keyboard, isForExperiment: true, nLoops: [60, 60] },
     "luchins": { task: luchins, userInputProcessor: null, isForExperiment: true, nLoops: [0] },
-    "dembo-rubinstein": { task: demboRubinstein, userInputProcessor: sliderInput, isForExperiment: true, nLoops: [30] },
+    "dembo-rubinstein": { task: demboRubinstein, userInputProcessor: sliderInput, isForExperiment: true, nLoops: [30, 10, 10, 10] },
     "digit span": { task: digitSpan, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
     "black schulte": { task: onlyBlackSchulteTable, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
     "black and red schulte": { task: blackAndRedSchulteTable, userInputProcessor: null, "isForExperiment": true, nLoops: [0] },
