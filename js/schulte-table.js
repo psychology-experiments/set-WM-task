@@ -1,8 +1,7 @@
-import * as visual from '../lib/visual-2021.1.4.js';
-import * as util from '../lib/util-2021.1.4.js';
+import * as visual from "../lib/visual-2021.1.4.js";
+import * as util from "../lib/util-2021.1.4.js";
 
 import { SingleMouseClick } from "./general.js";
-
 
 class OneColorSchulteProgress {
     constructor() {
@@ -19,9 +18,7 @@ class OneColorSchulteProgress {
     }
 }
 
-class TwoColorSchulteProgress {
-
-}
+class TwoColorSchulteProgress {}
 
 class SchulteProgress {
     constructor({ type }) {
@@ -30,15 +27,15 @@ class SchulteProgress {
         } else if (type === "red") {
             this._progress = new TwoColorSchulteProgress();
         } else {
-            throw new Error(`Schulte Table must be "black" or "red", was ${type}`);
+            throw new Error(
+                `Schulte Table must be "black" or "red", was ${type}`
+            );
         }
     }
 
     isCorrectAnswer({ answer }) {
         return this._progress.checkAnswer({ answer });
     }
-
-
 }
 
 class SchulteSquareModel {
@@ -63,19 +60,32 @@ class SchulteSquarePresenter {
 
     isCorrectChoice(progressChecker) {
         return progressChecker.isCorrectAnswer({ answer: this._model.number });
-
     }
-
 }
 
 class SchulteSquareView {
-    constructor({ window, sideSize, squareNumber, position, squareNumberColor = "black" }) {
-        this._presenter = new SchulteSquarePresenter({ number: squareNumber, numberColor: squareNumberColor });
+    constructor({
+        window,
+        sideSize,
+        squareNumber,
+        position,
+        squareNumberColor = "black",
+    }) {
+        this._presenter = new SchulteSquarePresenter({
+            number: squareNumber,
+            numberColor: squareNumberColor,
+        });
         const { color, number } = this._presenter.getModelProperties();
 
         this._originalSquareColor = "#FFFFFF";
         this._square = this._create_square(window, sideSize, position, number);
-        this._number = this._create_number(window, sideSize, position, number, color);
+        this._number = this._create_number(
+            window,
+            sideSize,
+            position,
+            number,
+            color
+        );
     }
 
     _create_square(window, sideSize, position, number) {
@@ -83,8 +93,8 @@ class SchulteSquareView {
             name: `square ${number}`,
             win: window,
             lineWidth: 3.0,
-            lineColor: new util.Color('black'),
-            fillColor: new util.Color('white'),
+            lineColor: new util.Color("black"),
+            fillColor: new util.Color("white"),
             opacity: 1.0,
             width: sideSize,
             height: sideSize,
@@ -102,7 +112,7 @@ class SchulteSquareView {
             text: `${number}`,
             alignHoriz: "center",
             alignVert: "center",
-            font: 'Arial',
+            font: "Arial",
             pos: position,
             height: sideSize * 0.7,
             color: color,
@@ -125,8 +135,11 @@ class SchulteSquareView {
 
     _startChange(color, time) {
         this._changeColor(color);
-        setTimeout(color => this._changeColor(color), time, this._originalSquareColor);
-
+        setTimeout(
+            (color) => this._changeColor(color),
+            time,
+            this._originalSquareColor
+        );
     }
 
     showCorrectness(progressChecker) {
@@ -137,9 +150,6 @@ class SchulteSquareView {
             let lightRed = "#FF9090";
             this._startChange(lightRed, 300);
         }
-
-
-
     }
 
     draw() {
@@ -152,7 +162,6 @@ class SchulteSquareView {
         this._number.setAutoDraw(isToAutoDraw);
     }
 }
-
 
 class SchulteTable {
     constructor({ window, side, squaresNumber, numberColor = "black" }) {
@@ -167,30 +176,34 @@ class SchulteTable {
 
     _generateSquares(window, side, numberColor) {
         let squaresInRow = Math.pow(this.squaresNumber, 0.5);
-        let positionsIndex = Array.from(Array(squaresInRow).keys()).map(function (value) {
-            return value - Math.floor(squaresInRow / 2);
-        });
+        let positionsIndex = Array.from(Array(squaresInRow).keys()).map(
+            function (value) {
+                return value - Math.floor(squaresInRow / 2);
+            }
+        );
 
-        let randomised_numbers = util.shuffle(Array.from(Array(this.squaresNumber).keys()).map((value) => value + 1));
+        let randomised_numbers = util.shuffle(
+            Array.from(Array(this.squaresNumber).keys()).map(
+                (value) => value + 1
+            )
+        );
 
         let randomisedIndex = 0;
         for (let xIndex of positionsIndex) {
             let x = xIndex * side;
             for (let yIndex of positionsIndex) {
                 let y = yIndex * side;
-                let square = new SchulteSquareView(
-                    {
-                        window: window,
-                        sideSize: side,
-                        squareNumber: randomised_numbers[randomisedIndex],
-                        position: [x, y],
-                        squareNumberColor: numberColor,
-                    });
+                let square = new SchulteSquareView({
+                    window: window,
+                    sideSize: side,
+                    squareNumber: randomised_numbers[randomisedIndex],
+                    position: [x, y],
+                    squareNumberColor: numberColor,
+                });
                 this._squares.push(square);
                 randomisedIndex += 1;
             }
         }
-
     }
 
     getClick(mouse) {
@@ -200,20 +213,22 @@ class SchulteTable {
 
         for (let square of this._squares) {
             if (mouse.isPressedIn(square)) {
-                console.error(square.getNumber(), this._singleClick.timePressed);
+                console.error(
+                    square.getNumber(),
+                    this._singleClick.timePressed
+                );
                 square.showCorrectness(this._progress);
             }
         }
     }
 
     draw() {
-        this._squares.forEach(singleSquare => singleSquare.draw());
+        this._squares.forEach((singleSquare) => singleSquare.draw());
     }
 
     setAutoDraw(isToAutoDraw) {
-        this._squares.forEach(square => square.setAutoDraw(isToAutoDraw));
+        this._squares.forEach((square) => square.setAutoDraw(isToAutoDraw));
     }
-
 }
 
 export { SchulteTable };

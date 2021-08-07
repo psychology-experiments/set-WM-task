@@ -1,5 +1,5 @@
-import * as visual from '../lib/visual-2021.1.4.js';
-import * as util from '../lib/util-2021.1.4.js';
+import * as visual from "../lib/visual-2021.1.4.js";
+import * as util from "../lib/util-2021.1.4.js";
 
 class DigitSpanView {
     constructor({ window }) {
@@ -21,4 +21,4 @@ class DigitSpanView {
     }
 }
 
-export {DigitSpanView as DigitSpan};
+export { DigitSpanView as DigitSpan };

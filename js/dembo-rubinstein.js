@@ -1,8 +1,7 @@
-import * as visual from '../lib/visual-2021.1.4.js';
-import * as util from '../lib/util-2021.1.4.js';
+import * as visual from "../lib/visual-2021.1.4.js";
+import * as util from "../lib/util-2021.1.4.js";
 
 import { TaskPresenter, TaskView, Instruction } from "./general.js";
-
 
 const firstInstruction = `
 Участие в олимпиадах требует определенного развития способностей и характера. 
@@ -31,9 +30,12 @@ const fourthInstruction = `
 означает самое низкое развитие, а правая – наивысшее. 
 Если ты готов начать, нажми СТРЕЛКУ ВПРАВО`;
 
-const instructions = [firstInstruction, secondInstruction, thirdInstruction, fourthInstruction]
-    .map(instruction => new Instruction(instruction));
-
+const instructions = [
+    firstInstruction,
+    secondInstruction,
+    thirdInstruction,
+    fourthInstruction,
+].map((instruction) => new Instruction(instruction));
 
 class SingleScale {
     constructor({ scaleDescrition, leftEnd, rightEnd }) {
@@ -42,7 +44,6 @@ class SingleScale {
         this._rightEnd = rightEnd;
     }
 }
-
 
 const prebuildScales = [
     new SingleScale({
@@ -77,36 +78,46 @@ const prebuildScales = [
     }),
 ];
 
-
-
-
 class DemboRubinsteinPresenter extends TaskPresenter {
     constructor({ window }) {
         const view = new DemboRubinsteinView({ window });
-        super({ name: "DemboRubinstein", instructionsText: instructions, view: view });
+        super({
+            name: "DemboRubinstein",
+            instructionsText: instructions,
+            view: view,
+        });
     }
 
     getTaskConditions() {
-        throw new Error(`Method 'getTaskConditions()' must be implemented in ${this.name} class.`);
+        throw new Error(
+            `Method 'getTaskConditions()' must be implemented in ${this.name} class.`
+        );
     }
 
     nextStimulus() {
-        throw new Error(`Method 'nextStimulus()' must be implemented in ${this.name} class.`);
+        throw new Error(
+            `Method 'nextStimulus()' must be implemented in ${this.name} class.`
+        );
     }
 
     checkInput(inputProcessor) {
-        throw new Error(`Method 'checkInput(inputProcessor)' must be implemented in ${this.name} class.`);
+        throw new Error(
+            `Method 'checkInput(inputProcessor)' must be implemented in ${this.name} class.`
+        );
     }
 
     isTrialFinished(userInputProcessor) {
-        throw new Error(`Method 'isTrialFinished(userInputProcessor)' must be implemented in ${this.name} class.`);
+        throw new Error(
+            `Method 'isTrialFinished(userInputProcessor)' must be implemented in ${this.name} class.`
+        );
     }
 
     isTaskFinished() {
-        throw new Error(`Method 'isTaskFinished()' must be implemented in ${this.name} class.`);
+        throw new Error(
+            `Method 'isTaskFinished()' must be implemented in ${this.name} class.`
+        );
     }
 }
-
 
 class DemboRubinsteinView extends TaskView {
     constructor({ window }) {

@@ -1,7 +1,6 @@
-import * as visual from '../lib/visual-2021.1.4.js';
-import * as util from '../lib/util-2021.1.4.js';
-import { TaskPresenter, TaskView, Instruction } from './general.js';
-
+import * as visual from "../lib/visual-2021.1.4.js";
+import * as util from "../lib/util-2021.1.4.js";
+import { TaskPresenter, TaskView, Instruction } from "./general.js";
 
 const instruction = `
 Сейчас тебе будет предложено решить несколько анаграмм. 
@@ -15,25 +14,25 @@ const instruction = `
 Помни, что возможен только один правильный вариант. 
 Если готов, нажми СТРЕЛКУ ВПРАВО`;
 
-
 const anagrams = [
-    ['тонус', 'отусн'],
-    ['хомяк', 'мкохя'],
-    ['моряк', 'кмяро'],
-    ['ребус', 'есурб'],
-    ['номер', 'мроне'],
-    ['бедро', 'оребд'],
-    ['бекон', 'бноке'],
-    ['ветка', 'тавке'],
-    ['школа', 'кшало'],
-    ['дупло', 'лдопу']
+    ["тонус", "отусн"],
+    ["хомяк", "мкохя"],
+    ["моряк", "кмяро"],
+    ["ребус", "есурб"],
+    ["номер", "мроне"],
+    ["бедро", "оребд"],
+    ["бекон", "бноке"],
+    ["ветка", "тавке"],
+    ["школа", "кшало"],
+    ["дупло", "лдопу"],
 ];
-
 
 class SingleAnagram {
     constructor({ answer, anagram }) {
         if (answer.length !== anagram.length) {
-            throw new Error(`Anagram length (${anagram}) must be equal answer length (${answer})`);
+            throw new Error(
+                `Anagram length (${anagram}) must be equal answer length (${answer})`
+            );
         }
 
         this.answer = answer;
@@ -71,7 +70,8 @@ class AnagramsPresenter extends TaskPresenter {
     checkInput(userInputProcessor) {
         const inputData = userInputProcessor.getData();
         const participantAnswer = inputData.participantAnswer;
-        const isCorrectAnswer = participantAnswer === this._currentStimulus.answer;
+        const isCorrectAnswer =
+            participantAnswer === this._currentStimulus.answer;
 
         let attemptData = {
             task: this.name,
@@ -86,7 +86,6 @@ class AnagramsPresenter extends TaskPresenter {
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
         userInputProcessor.clearInput();
         this._trial_finished = isCorrectAnswer;
-
     }
 
     addUnfinishedTrialData(userInputProcessor) {
@@ -130,7 +129,6 @@ class AnagramsPresenter extends TaskPresenter {
     isTaskFinished() {
         return this._anagrams.length === 0;
     }
-
 }
 
 class AnagramsView extends TaskView {
@@ -145,7 +143,6 @@ class AnagramsView extends TaskView {
             autoDraw: false,
             bold: true,
         });
-
     }
 
     setAnagram(anagramText) {

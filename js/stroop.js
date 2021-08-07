@@ -1,8 +1,13 @@
-import * as visual from '../lib/visual-2021.1.4.js';
-import * as util from '../lib/util-2021.1.4.js';
+import * as visual from "../lib/visual-2021.1.4.js";
+import * as util from "../lib/util-2021.1.4.js";
 
-import { TaskPresenter, TaskView, Instruction, cartesian, choices } from "./general.js";
-
+import {
+    TaskPresenter,
+    TaskView,
+    Instruction,
+    cartesian,
+    choices,
+} from "./general.js";
 
 const ALLOWED_SYMBOLS = {
     R: { word: "красный", color: "red" },
@@ -11,14 +16,12 @@ const ALLOWED_SYMBOLS = {
     Y: { word: "жёлтый", color: "yellow" },
 };
 
-
 const KEYS_TO_ANSWERS = {
     1: "R",
     2: "Y",
     3: "G",
     4: "B",
 };
-
 
 const firstPartInstruction = `
 Сейчас на экране будут показаны слова, окрашенные в различные цвета. 
@@ -30,7 +33,6 @@ const firstPartInstruction = `
 Постарайся выполнять задание как можно быстрее и точнее!
 Если готов, нажми СТРЕЛКУ ВПРАВО`;
 
-
 const secondPartInstruction = `
 Сейчас на экране будут показаны слова, окрашенные в различные цвета. 
 Но в этот раз необходимо определять написанное СЛОВО.
@@ -41,14 +43,14 @@ const secondPartInstruction = `
 Постарайся выполнять задание как можно быстрее и точнее!
 Если готов, нажми СТРЕЛКУ ВПРАВО`;
 
-
 class StroopWord {
     constructor([wordSymbol, colorSymbol]) {
         this.name = wordSymbol + colorSymbol;
         this.text = ALLOWED_SYMBOLS[wordSymbol].word;
         this.color = ALLOWED_SYMBOLS[colorSymbol].color;
 
-        this.congurence = wordSymbol === colorSymbol ? "congruent" : "incongruent";
+        this.congurence =
+            wordSymbol === colorSymbol ? "congruent" : "incongruent";
 
         if (this.text === undefined || this.color === undefined) {
             const supportedSymbols = Object.keys(ALLOWED_SYMBOLS);
@@ -67,7 +69,11 @@ class AnswerChecker {
         let wordProperties = { text: 0, color: 1 };
 
         if (!(wordPropertyToCheck in wordProperties)) {
-            throw Error(`Only possible to use ${Object.keys(wordProperties)} but was given ${wordPropertyToCheck}`);
+            throw Error(
+                `Only possible to use ${Object.keys(
+                    wordProperties
+                )} but was given ${wordPropertyToCheck}`
+            );
         }
 
         this._property = wordProperties[wordPropertyToCheck];
@@ -84,10 +90,14 @@ class StroopTestPresenter extends TaskPresenter {
     constructor({ window, startTime }) {
         const instructions = [
             new Instruction(firstPartInstruction),
-            new Instruction(secondPartInstruction)
+            new Instruction(secondPartInstruction),
         ];
         const view = new StroopTestView({ window, startTime });
-        super({ name: "StroopTest", instructionsText: instructions, view: view });
+        super({
+            name: "StroopTest",
+            instructionsText: instructions,
+            view: view,
+        });
 
         this._part = "color";
         this._currentStimuli = null;
@@ -104,12 +114,15 @@ class StroopTestPresenter extends TaskPresenter {
             text: this._generateStimiliSet(),
         };
 
-        this._view.createStimuli({ window: window, stimuliInfo: this._getStimuliInfo() });
+        this._view.createStimuli({
+            window: window,
+            stimuliInfo: this._getStimuliInfo(),
+        });
     }
 
     _createWords() {
         const symbols = Object.keys(ALLOWED_SYMBOLS);
-        let words = { "congruent": [], "incongruent": [] };
+        let words = { congruent: [], incongruent: [] };
         for (let wordInfo of cartesian(symbols, symbols)) {
             const word = new StroopWord(wordInfo);
             words[word.congurence].push(word);
@@ -124,7 +137,7 @@ class StroopTestPresenter extends TaskPresenter {
         return util.shuffle(wordsSet);
     }
 
-    * _getStimuliInfo() {
+    *_getStimuliInfo() {
         for (let wordType of Object.values(this._words)) {
             for (let wordInfo of wordType) {
                 yield wordInfo;
@@ -145,7 +158,9 @@ class StroopTestPresenter extends TaskPresenter {
 
     checkInput(userInputProcessor) {
         const inputData = userInputProcessor.getData();
-        const isCorrectAnswer = this._checkAnswer({ buttonPressedName: inputData.keyName });
+        const isCorrectAnswer = this._checkAnswer({
+            buttonPressedName: inputData.keyName,
+        });
 
         let attemptData = {
             task: this.name,
@@ -160,7 +175,6 @@ class StroopTestPresenter extends TaskPresenter {
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
         this._trial_finished = true;
     }
-
 
     nextStimulus() {
         if (this._stimuli[this._part].length === 0) {
@@ -179,7 +193,7 @@ class StroopTestPresenter extends TaskPresenter {
 
     stop() {
         super.stop();
-        
+
         if (this._stimuli[this._part].length === 0) {
             this._view.showHint(false);
         }
@@ -195,7 +209,9 @@ class StroopTestPresenter extends TaskPresenter {
     }
 
     isTaskFinished() {
-        return this._stimuli.color.length === 0 && this._stimuli.text.length === 0;
+        return (
+            this._stimuli.color.length === 0 && this._stimuli.text.length === 0
+        );
     }
 }
 
@@ -253,7 +269,5 @@ class StroopTestView extends TaskView {
         this._currentStimulus.setAutoDraw(toShow);
     }
 }
-
-
 
 export { StroopTestPresenter as StroopTest };
