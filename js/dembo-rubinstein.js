@@ -31,16 +31,86 @@ const fourthInstruction = `
 означает самое низкое развитие, а правая – наивысшее. 
 Если ты готов начать, нажми СТРЕЛКУ ВПРАВО`;
 
-const instructions = [firstInstruction, secondInstruction, thirdInstruction, fourthInstruction];
+const instructions = [firstInstruction, secondInstruction, thirdInstruction, fourthInstruction]
+    .map(instruction => new Instruction(instruction));
+
+
+class SingleScale {
+    constructor({ scaleDescrition, leftEnd, rightEnd }) {
+        this._scaleDescrition = scaleDescrition;
+        this._leftEnd = leftEnd;
+        this._rightEnd = rightEnd;
+    }
+}
+
+
+const prebuildScales = [
+    new SingleScale({
+        scaleDescrition: "Во время подготовки к олимпиаде я:",
+        leftEnd: "действую по указанию других",
+        rightEnd: "самостоятельно",
+    }),
+    new SingleScale({
+        scaleDescrition: "Когда я решаю задачи, я:",
+        leftEnd: "рассеянный",
+        rightEnd: "сосредоточенный",
+    }),
+    new SingleScale({
+        scaleDescrition: "Обычно мое решение:",
+        leftEnd: "шаблонное",
+        rightEnd: "креативное",
+    }),
+    new SingleScale({
+        scaleDescrition: "Мои знания о математике:",
+        leftEnd: "поверхностные",
+        rightEnd: "глубокие",
+    }),
+    new SingleScale({
+        scaleDescrition: "В момент решения задачи я:",
+        leftEnd: "неуверенный",
+        rightEnd: "уверенный",
+    }),
+    new SingleScale({
+        scaleDescrition: "Во время участия в олимпиаде я:",
+        leftEnd: "встревоженный",
+        rightEnd: "спокойный",
+    }),
+];
+
+
+
 
 class DemboRubinsteinPresenter extends TaskPresenter {
+    constructor({ window }) {
+        const view = new DemboRubinsteinView({ window });
+        super({ name: "DemboRubinstein", instructionsText: instructions, view: view });
+    }
 
+    getTaskConditions() {
+        throw new Error(`Method 'getTaskConditions()' must be implemented in ${this.name} class.`);
+    }
 
+    nextStimulus() {
+        throw new Error(`Method 'nextStimulus()' must be implemented in ${this.name} class.`);
+    }
+
+    checkInput(inputProcessor) {
+        throw new Error(`Method 'checkInput(inputProcessor)' must be implemented in ${this.name} class.`);
+    }
+
+    isTrialFinished(userInputProcessor) {
+        throw new Error(`Method 'isTrialFinished(userInputProcessor)' must be implemented in ${this.name} class.`);
+    }
+
+    isTaskFinished() {
+        throw new Error(`Method 'isTaskFinished()' must be implemented in ${this.name} class.`);
+    }
 }
 
 
 class DemboRubinsteinView extends TaskView {
     constructor({ window }) {
+        super({});
         this.dummy = new visual.TextStim({
             win: window,
             color: new util.Color("black"),
