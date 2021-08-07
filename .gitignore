@@ -29,6 +29,9 @@ ENV/
 # JS linters
 .jshintrc
 
+# Prettier 
+.prettierrc.json
+
 # Spyder project settings
 .spyderproject
 .spyproject
