@@ -1,5 +1,5 @@
-import * as visual from "../lib/visual-2021.1.4.js";
-import * as util from "../lib/util-2021.1.4.js";
+import { util, visual } from "../lib/psychojs-2021.2.2.js";
+
 import { TaskPresenter, TaskView, Instruction } from "./general.js";
 
 const instruction = `

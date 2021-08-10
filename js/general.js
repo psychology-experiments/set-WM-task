@@ -1,7 +1,4 @@
-import * as core from "../lib/core-2021.1.4.js";
-import * as data from "../lib/data-2021.1.4.js";
-import * as util from "../lib/util-2021.1.4.js";
-import * as visual from "../lib/visual-2021.1.4.js";
+import { core, data, util, visual } from "../lib/psychojs-2021.2.2.js";
 
 class TaskPresenter {
     /**
@@ -350,12 +347,23 @@ class SliderInput extends UserInputProcessor {
     constructor({ psychoJS, additionalTrialData }) {
         super({ inputType: "SliderInput", additionalTrialData });
         this._psychoJS = psychoJS;
+
+        this._slider = new visual.Slider({
+            win: this._psychoJS.window,
+            size: [900, 50],
+            units: "pix",
+            ticks: [0, 100],
+            fontSize: 50,
+            color: new util.Color("black"),
+            // style: visual.Slider.Style.RATING,
+        });
+
+        // this._inputConfirmationButton = new visual.ButtonStim();
     }
 
     initilize(taskConditions) {
-        throw new Error(
-            `Method 'initilize(taskConditions)' must be implemented in ${this.inputType}.`
-        );
+        this._isInitilized = true;
+        this._slider.setAutoDraw(true);
     }
 
     stop() {
@@ -365,9 +373,7 @@ class SliderInput extends UserInputProcessor {
     }
 
     isSendInput() {
-        throw new Error(
-            `Method 'isSendInput()' must be implemented in ${this.inputType}.`
-        );
+        return false;
     }
 
     getInput() {

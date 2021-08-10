@@ -7,32 +7,32 @@ async function renderTasks({ tasksFp, parentElement }) {
         subtasksNode.className = "subtasks";
 
         taskNode.innerText = task;
-        renderSubTasks({ subtasks: tasks[task], parentTasksList: subtasksNode })
-        
+        renderSubTasks({
+            subtasks: tasks[task],
+            parentTasksList: subtasksNode,
+        });
+
         taskNode.appendChild(subtasksNode);
         parentElement.appendChild(taskNode);
     }
 }
 
 function loadJSONFile({ filename }) {
-    let result = fetch(filename)
-        .then(response => response.json());
+    let result = fetch(filename).then((response) => response.json());
 
     return result;
 }
 
-
 function renderSubTasks({ subtasks, parentTasksList }) {
     for (let [subTaskText, isDone] of Object.entries(subtasks)) {
-        let subTaskNode = createSubTask({ text: subTaskText, isDone: isDone })
+        let subTaskNode = createSubTask({ text: subTaskText, isDone: isDone });
         parentTasksList.appendChild(subTaskNode);
     }
-
 }
 
 function createSubTask({ text, isDone }) {
     let subtaskNode = document.createElement("li");
-    
+
     let subtaskInput = document.createElement("input");
     subtaskInput.value = text;
     subtaskInput.className = "subtaskField";
@@ -47,6 +47,5 @@ function createSubTask({ text, isDone }) {
     return subtaskNode;
 }
 
-
-let tasksListElement = document.getElementById('tasks');
+let tasksListElement = document.getElementById("tasks");
 renderTasks({ tasksFp: "tasks.json", parentElement: tasksListElement });

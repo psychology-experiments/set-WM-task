@@ -1,14 +1,13 @@
 /*************
  * Test Test *
  *************/
-
-import { PsychoJS } from "./lib/core-2021.1.4.js";
-import * as core from "./lib/core-2021.1.4.js";
-// import * as data from './lib/data-2021.1.4.js';
-import { Scheduler } from "./lib/util-2021.1.4.js";
-import * as visual from "./lib/visual-2021.1.4.js";
-// import * as sound from './lib/sound-2021.1.4.js';
-import * as util from "./lib/util-2021.1.4.js";
+import { core, data, util, visual } from "./lib/psychojs-2021.2.2.js";
+const { PsychoJS } = core;
+const { TrialHandler } = data;
+const { Scheduler } = util;
+//some handy aliases as in the psychopy scripts;
+const { abs, sin, cos, PI: pi, sqrt } = Math;
+const { round } = util;
 
 import * as general from "./js/general.js";
 import { SchulteTable } from "./js/schulte-table.js";
@@ -18,9 +17,9 @@ import { Luchins } from "./js/luchins.js";
 import { DemboRubinstein } from "./js/dembo-rubinstein.js";
 import { DigitSpan } from "./js/digit-span.js";
 
-//some handy aliases as in the psychopy scripts;
-const { abs, sin, cos, PI: pi, sqrt } = Math;
-const { round } = util;
+// store info about the experiment session:
+let expName = "WM-tasks"; // from the Builder filename that created this script
+let expInfo = { participant: "" };
 
 // init psychoJS:
 const psychoJS = new PsychoJS({
@@ -34,10 +33,6 @@ psychoJS.openWindow({
     units: "pix",
     waitBlanking: true,
 });
-
-// store info about the experiment session:
-let expName = "WM-tasks"; // from the Builder filename that created this script
-let expInfo = { participant: "" };
 
 // Start code blocks for 'Before Experiment'
 // schedule the experiment:
