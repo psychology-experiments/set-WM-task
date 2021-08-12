@@ -86,12 +86,16 @@ class AnswerChecker {
 }
 
 class StroopTestPresenter extends TaskPresenter {
-    constructor({ window, startTime }) {
+    constructor({ window, screenSizeAdapter, startTime }) {
         const instructions = [
             new Instruction(firstPartInstruction),
             new Instruction(secondPartInstruction),
         ];
-        const view = new StroopTestView({ window, startTime });
+        const view = new StroopTestView({
+            window,
+            screenSizeAdapter,
+            startTime,
+        });
         super({
             name: "StroopTest",
             instructionsText: instructions,
@@ -115,6 +119,7 @@ class StroopTestPresenter extends TaskPresenter {
 
         this._view.createStimuli({
             window: window,
+            screenSizeAdapter: screenSizeAdapter,
             stimuliInfo: this._getStimuliInfo(),
         });
     }
@@ -215,23 +220,24 @@ class StroopTestPresenter extends TaskPresenter {
 }
 
 class StroopTestView extends TaskView {
-    constructor({ window, startTime }) {
+    constructor({ window, screenSizeAdapter, startTime }) {
         super({ startTime });
 
         this._currentStimulus = null;
         this._words = {};
 
-        const hintLetterSize = 50;
+        const hintLetterSize = screenSizeAdapter.rescaleTextSize(0.1);
 
         this._stroopHint = new visual.TextStim({
             win: window,
             text: this._generateHintText(),
             color: "black",
+            units: "norm",
             height: hintLetterSize,
-            pos: [0, window.size[1] * 0.5 - hintLetterSize * 2],
+            pos: [0, 0.6 - hintLetterSize],
             autoDraw: false,
             bold: true,
-            wrapWidth: window.size[0] * 0.8,
+            wrapWidth: screenSizeAdapter.rescaleWrapWidth(0.8),
         });
     }
 
@@ -242,13 +248,13 @@ class StroopTestView extends TaskView {
         return hintText;
     }
 
-    createStimuli({ window, stimuliInfo }) {
+    createStimuli({ window, screenSizeAdapter, stimuliInfo }) {
         for (let stimulusInfo of stimuliInfo) {
             const wordStimulus = new visual.TextStim({
                 win: window,
                 text: stimulusInfo.text,
                 color: stimulusInfo.color,
-                height: 100,
+                height: screenSizeAdapter.rescaleTextSize(0.1),
                 autoDraw: false,
                 bold: true,
             });

@@ -107,9 +107,9 @@ class TaskPresenter {
         );
     }
 
-    isTrialFinished(userInputProcessor) {
+    isTrialFinished() {
         throw new Error(
-            `Method 'isTrialFinished(userInputProcessor)' must be implemented in ${this.name} class.`
+            `Method 'isTrialFinished()' must be implemented in ${this.name} class.`
         );
     }
 
@@ -203,12 +203,6 @@ class UserInputProcessor {
     isSendInput() {
         throw new Error(
             `Method 'isSendInput()' must be implemented in ${this.inputType}.`
-        );
-    }
-
-    getInput() {
-        throw new Error(
-            `Method 'getInput()' must be implemented in ${this.inputType}.`
         );
     }
 
@@ -344,48 +338,68 @@ class SingleSymbolKeyboard extends UserInputProcessor {
 }
 
 class SliderInput extends UserInputProcessor {
-    constructor({ psychoJS, additionalTrialData }) {
+    constructor({
+        psychoJS,
+        size,
+        position,
+        additionalTrialData,
+        screenSizeAdapter,
+    }) {
         super({ inputType: "SliderInput", additionalTrialData });
         this._psychoJS = psychoJS;
 
         this._slider = new visual.Slider({
             win: this._psychoJS.window,
-            size: [900, 50],
-            units: "pix",
+            size: screenSizeAdapter.rescaleElementSize(size),
+            pos: screenSizeAdapter.rescalePosition(position),
             ticks: [0, 100],
-            fontSize: 50,
+            fontSize: screenSizeAdapter.rescaleTextSize(0.01),
             color: new util.Color("black"),
-            // style: visual.Slider.Style.RATING,
+            style: ["RATING", "TRIANGLE_MARKER"],
         });
 
-        // this._inputConfirmationButton = new visual.ButtonStim();
+        this._inputConfirmationButton = new visual.ButtonStim({
+            win: this._psychoJS.window,
+            text: "Дальше",
+            pos: screenSizeAdapter.rescalePosition([0, -0.35]),
+            letterHeight: screenSizeAdapter.rescaleTextSize(0.05),
+            size: screenSizeAdapter.rescaleElementSize([0.17, 0.03]),
+            fillColor: new util.Color("#999999"),
+        });
     }
 
     initilize(taskConditions) {
+        this._slider.reset();
+        this._inputConfirmationButton.fillColor = new util.Color("#999999");
         this._isInitilized = true;
         this._slider.setAutoDraw(true);
+        this._inputConfirmationButton.setAutoDraw(true);
     }
 
     stop() {
-        throw new Error(
-            `Method 'stop()' must be implemented in ${this.inputType}.`
-        );
+        this._slider.setAutoDraw(false);
+        this._inputConfirmationButton.setAutoDraw(false);
+        this._isInitilized = false;
     }
 
     isSendInput() {
-        return false;
-    }
+        const rating = this._slider.getRating();
 
-    getInput() {
-        throw new Error(
-            `Method 'getInput()' must be implemented in ${this.inputType}.`
-        );
+        if (rating === undefined) {
+            return false;
+        }
+
+        this._inputConfirmationButton.fillColor = new util.Color("#4CBB17");
+        return this._inputConfirmationButton.isClicked;
     }
 
     getData() {
-        throw new Error(
-            `Method 'getData()' must be implemented in ${this.inputType}.`
-        );
+        const inputData = {
+            sliderRating: this._slider.getRating(),
+            RT: this._slider.getRT(),
+        };
+
+        return this._additionalTrialData.addData(inputData);
     }
 
     showInputError() {
@@ -395,24 +409,21 @@ class SliderInput extends UserInputProcessor {
     }
 
     clearInput() {
-        throw new Error(
-            `Method 'clearInput()' must be implemented in ${this.inputType}.`
-        );
+        this._slider.reset();
     }
 }
 
 class WordInputProcessor extends UserInputProcessor {
-    constructor({ psychoJS, additionalTrialData }) {
+    constructor({ psychoJS, additionalTrialData, screenSizeAdapter }) {
         super({ inputType: "WordInputProcessor", additionalTrialData });
         this._inputWindow = new visual.TextBox({
             win: psychoJS.window,
             name: "textbox",
             text: "",
             font: "Open Sans",
-            pos: [0, -200],
-            letterHeight: 70,
-            size: [400, 150],
-            units: "pix",
+            pos: screenSizeAdapter.rescalePosition([0, -0.1]),
+            letterHeight: screenSizeAdapter.rescaleTextSize(0.1),
+            size: screenSizeAdapter.rescaleElementSize([0.3, 0.2]),
             color: "black",
             colorSpace: "rgb",
             fillColor: "lightgrey",
@@ -630,6 +641,8 @@ class ExperimentOrganizer {
         routineSettings,
         showInstructions
     ) {
+        // TODO: change generator to create new trial for every loop breakpoint
+
         // set up handler to look after randomisation of conditions etc
         let trials = new data.TrialHandler({
             psychoJS: this._psychoJS,
@@ -784,6 +797,29 @@ class AdditionalTrialData {
     }
 }
 
+class ScreenHeightRescaler {
+    constructor(windowSize) {
+        this._height = 1;
+        this._width = windowSize[0] / windowSize[1];
+    }
+
+    rescaleElementSize([originalWidth, originalHeight]) {
+        return [originalWidth * this._width, originalHeight * this._height];
+    }
+
+    rescalePosition([originalXPos, originalYPos]) {
+        return [originalXPos * this._width, originalYPos * this._height];
+    }
+
+    rescaleTextSize(originalTextSize) {
+        return originalTextSize;
+    }
+
+    rescaleWrapWidth(originalWrapWidth) {
+        return originalWrapWidth * this._width;
+    }
+}
+
 function choice(seq) {
     // Choose a random element from a non-empty sequence.
     let length = seq.length;
@@ -820,6 +856,7 @@ export {
     WordInputProcessor,
     SingleMouseClick,
     SliderInput,
+    ScreenHeightRescaler,
     TaskPresenter,
     TaskView,
     choice,

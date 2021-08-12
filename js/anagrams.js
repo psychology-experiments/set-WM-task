@@ -41,9 +41,9 @@ class SingleAnagram {
 }
 
 class AnagramsPresenter extends TaskPresenter {
-    constructor({ window, startTime }) {
+    constructor({ window, screenSizeAdapter, startTime }) {
         const instructions = [new Instruction(instruction)];
-        const view = new AnagramsView({ window, startTime });
+        const view = new AnagramsView({ window, screenSizeAdapter, startTime });
         super({ name: "Anagrams", instructionsText: instructions, view: view });
 
         this._currentStimulus = null;
@@ -132,14 +132,15 @@ class AnagramsPresenter extends TaskPresenter {
 }
 
 class AnagramsView extends TaskView {
-    constructor({ window, startTime }) {
+    constructor({ window, screenSizeAdapter, startTime }) {
         super({ startTime });
 
         this._anagramStimulus = new visual.TextStim({
             win: window,
             text: "",
             color: "black",
-            height: 100,
+            pos: screenSizeAdapter.rescalePosition([0, 0.2]),
+            height: screenSizeAdapter.rescaleTextSize(0.15),
             autoDraw: false,
             bold: true,
         });

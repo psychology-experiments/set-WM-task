@@ -30,9 +30,10 @@ const psychoJS = new PsychoJS({
 psychoJS.openWindow({
     fullscr: true,
     color: new util.Color("white"),
-    units: "pix",
+    units: "height",
     waitBlanking: true,
 });
+psychoJS.window.adjustScreenSize();
 
 // Start code blocks for 'Before Experiment'
 // schedule the experiment:
@@ -108,51 +109,62 @@ var mouse;
 var keyboard;
 var wordInputProcessor;
 var sliderInput;
+var screenHeightRescaler;
 var additionalDataHandler;
 var dataSaver;
 var experimentSequence;
 // var testORA;
 function experimentInit() {
-    // Initialize components for WM tasks
+    // // Initialize components for WM tasks
+    screenHeightRescaler = new general.ScreenHeightRescaler(
+        psychoJS.window.size
+    );
 
     onlyBlackSchulteTable = new SchulteTable({
         window: psychoJS.window,
-        side: 100,
+        screenSizeAdapter: screenHeightRescaler,
+        side: 0.032,
         squaresNumber: 25,
     });
 
     blackAndRedSchulteTable = new SchulteTable({
         window: psychoJS.window,
-        side: 100,
+        screenSizeAdapter: screenHeightRescaler,
+        side: 0.016,
         squaresNumber: 49,
     });
 
     stroop = new StroopTest({
         window: psychoJS.window,
+        screenSizeAdapter: screenHeightRescaler,
         startTime: 0.1,
     });
 
     anagrams = new Anagrams({
         window: psychoJS.window,
+        screenSizeAdapter: screenHeightRescaler,
         startTime: 0.1,
     });
 
     luchins = new Luchins({
         window: psychoJS.window,
+        screenSizeAdapter: screenHeightRescaler,
     });
 
     demboRubinstein = new DemboRubinstein({
         window: psychoJS.window,
+        screenSizeAdapter: screenHeightRescaler,
     });
 
     digitSpan = new DigitSpan({
         window: psychoJS.window,
+        screenSizeAdapter: screenHeightRescaler,
     });
 
     instructionPresenter = new visual.TextStim({
         win: psychoJS.window,
-        height: 50,
-        wrapWidth: psychoJS.window.size[0] * 0.8,
+        height: screenHeightRescaler.rescaleTextSize(0.05),
+        wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.9),
         color: new util.Color("black"),
     });
     instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
@@ -176,11 +188,15 @@ function experimentInit() {
     wordInputProcessor = new general.WordInputProcessor({
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
+        screenSizeAdapter: screenHeightRescaler,
     });
 
     sliderInput = new general.SliderInput({
         psychoJS: psychoJS,
+        size: [0.5, 0.04],
+        position: [0, 0.1],
         additionalTrialData: additionalDataHandler,
+        screenSizeAdapter: screenHeightRescaler,
     });
 
     dataSaver = new general.DataSaver({
@@ -252,7 +268,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "dembo-rubinstein",
+        showOnly: "anagrams",
         showInstructions: true,
     });
 
@@ -266,9 +282,9 @@ function developerMessage(snapshot) {
     let developerInstruction = new visual.TextStim({
         win: psychoJS.window,
         color: new util.Color("black"),
-        height: 100,
+        height: 0.05,
         text: 'Код находится в процессе разработки.\nДля переключения между задачами используйте клавишу "q"',
-        wrapWidth: psychoJS.window.size[0] * 0.8,
+        wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
     });
     return function () {
         developerInstruction.draw();
@@ -417,84 +433,84 @@ function quitPsychoJS(message, isCompleted) {
     return Scheduler.Event.QUIT;
 }
 
-function onlyBlackSchulteTableRoutine(snapshot) {
-    return function () {
-        onlyBlackSchulteTable.getClick(mouse);
-        onlyBlackSchulteTable.draw();
+// function onlyBlackSchulteTableRoutine(snapshot) {
+//     return function () {
+//         onlyBlackSchulteTable.getClick(mouse);
+//         onlyBlackSchulteTable.draw();
 
-        // check for quit (typically the Esc key)
-        if (
-            psychoJS.experiment.experimentEnded ||
-            psychoJS.eventManager.getKeys({ keyList: ["escape"] }).length > 0
-        ) {
-            return quitPsychoJS(
-                "The [Escape] key was pressed. Goodbye!",
-                false
-            );
-        }
+//         // check for quit (typically the Esc key)
+//         if (
+//             psychoJS.experiment.experimentEnded ||
+//             psychoJS.eventManager.getKeys({ keyList: ["escape"] }).length > 0
+//         ) {
+//             return quitPsychoJS(
+//                 "The [Escape] key was pressed. Goodbye!",
+//                 false
+//             );
+//         }
 
-        // Developer's option to look on different tasks
-        if (
-            experimentSequence.isDeveloped &&
-            psychoJS.eventManager.getKeys({ keyList: ["q"] }).length > 0
-        ) {
-            onlyBlackSchulteTable.setAutoDraw(false);
-            return Scheduler.Event.NEXT;
-        }
+//         // Developer's option to look on different tasks
+//         if (
+//             experimentSequence.isDeveloped &&
+//             psychoJS.eventManager.getKeys({ keyList: ["q"] }).length > 0
+//         ) {
+//             onlyBlackSchulteTable.setAutoDraw(false);
+//             return Scheduler.Event.NEXT;
+//         }
 
-        // check if the Routine should terminate
-        // if (!continueRoutine) {  // a component has requested a forced-end of Routine
-        //   return Scheduler.Event.NEXT;
-        // }
+//         // check if the Routine should terminate
+//         // if (!continueRoutine) {  // a component has requested a forced-end of Routine
+//         //   return Scheduler.Event.NEXT;
+//         // }
 
-        // refresh the screen if continuing
-        // if (continueRoutine && routineTimer.getTime() > 0) {
-        //   return Scheduler.Event.FLIP_REPEAT;
-        // } else {
-        //   return Scheduler.Event.NEXT;
-        // }
+//         // refresh the screen if continuing
+//         // if (continueRoutine && routineTimer.getTime() > 0) {
+//         //   return Scheduler.Event.FLIP_REPEAT;
+//         // } else {
+//         //   return Scheduler.Event.NEXT;
+//         // }
 
-        return Scheduler.Event.FLIP_REPEAT;
-    };
-}
+//         return Scheduler.Event.FLIP_REPEAT;
+//     };
+// }
 
-function blackAndRedSchulteTableRoutine(snapshot) {
-    return function () {
-        blackAndRedSchulteTable.getClick(mouse);
-        blackAndRedSchulteTable.draw();
+// function blackAndRedSchulteTableRoutine(snapshot) {
+//     return function () {
+//         blackAndRedSchulteTable.getClick(mouse);
+//         blackAndRedSchulteTable.draw();
 
-        // check for quit (typically the Esc key)
-        if (
-            psychoJS.experiment.experimentEnded ||
-            psychoJS.eventManager.getKeys({ keyList: ["escape"] }).length > 0
-        ) {
-            return quitPsychoJS(
-                "The [Escape] key was pressed. Goodbye!",
-                false
-            );
-        }
+//         // check for quit (typically the Esc key)
+//         if (
+//             psychoJS.experiment.experimentEnded ||
+//             psychoJS.eventManager.getKeys({ keyList: ["escape"] }).length > 0
+//         ) {
+//             return quitPsychoJS(
+//                 "The [Escape] key was pressed. Goodbye!",
+//                 false
+//             );
+//         }
 
-        // Developer's option to look on different tasks
-        if (
-            experimentSequence.isDeveloped &&
-            psychoJS.eventManager.getKeys({ keyList: ["q"] }).length > 0
-        ) {
-            blackAndRedSchulteTable.setAutoDraw(false);
-            return Scheduler.Event.NEXT;
-        }
+//         // Developer's option to look on different tasks
+//         if (
+//             experimentSequence.isDeveloped &&
+//             psychoJS.eventManager.getKeys({ keyList: ["q"] }).length > 0
+//         ) {
+//             blackAndRedSchulteTable.setAutoDraw(false);
+//             return Scheduler.Event.NEXT;
+//         }
 
-        // check if the Routine should terminate
-        // if (!continueRoutine) {  // a component has requested a forced-end of Routine
-        //   return Scheduler.Event.NEXT;
-        // }
+//         // check if the Routine should terminate
+//         // if (!continueRoutine) {  // a component has requested a forced-end of Routine
+//         //   return Scheduler.Event.NEXT;
+//         // }
 
-        // refresh the screen if continuing
-        // if (continueRoutine && routineTimer.getTime() > 0) {
-        //   return Scheduler.Event.FLIP_REPEAT;
-        // } else {
-        //   return Scheduler.Event.NEXT;
-        // }
+//         // refresh the screen if continuing
+//         // if (continueRoutine && routineTimer.getTime() > 0) {
+//         //   return Scheduler.Event.FLIP_REPEAT;
+//         // } else {
+//         //   return Scheduler.Event.NEXT;
+//         // }
 
-        return Scheduler.Event.FLIP_REPEAT;
-    };
-}
+//         return Scheduler.Event.FLIP_REPEAT;
+//     };
+// }
