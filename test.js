@@ -225,7 +225,7 @@ function experimentInit() {
             task: demboRubinstein,
             userInputProcessor: sliderInput,
             isForExperiment: true,
-            nLoops: [30, 10, 10, 10],
+            nLoops: [6, 10, 10, 10],
         },
         "digit span": {
             task: digitSpan,
@@ -268,7 +268,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "anagrams",
+        showOnly: "dembo-rubinstein",
         showInstructions: true,
     });
 
