@@ -379,7 +379,10 @@ class SliderInput extends UserInputProcessor {
         this._inputConfirmationButton.fillColor = this._inactiveButtonColor;
         this._isInitilized = true;
         this._slider.setAutoDraw(true);
-        this._inputConfirmationButton.setAutoDraw(true);
+
+        if (this._checkRating) {
+            this._inputConfirmationButton.setAutoDraw(true);
+        }
     }
 
     stop() {
@@ -389,9 +392,13 @@ class SliderInput extends UserInputProcessor {
     }
 
     isSendInput() {
+        // if (!this._checkRating) {
+        //     return true;
+        // }
+
         const rating = this._slider.getRating();
 
-        if (this._checkRating && rating === undefined) {
+        if (rating === undefined) {
             return false;
         }
 
