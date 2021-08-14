@@ -348,6 +348,7 @@ class SliderInput extends UserInputProcessor {
         super({ inputType: "SliderInput", additionalTrialData });
         this._psychoJS = psychoJS;
 
+        this._checkRating = true;
         this._slider = new visual.Slider({
             win: this._psychoJS.window,
             size: screenSizeAdapter.rescaleElementSize(size),
@@ -358,19 +359,24 @@ class SliderInput extends UserInputProcessor {
             style: ["RATING", "TRIANGLE_MARKER"],
         });
 
+        this._inactiveButtonColor = new util.Color("#999999");
+        this._activeButtonColor = new util.Color("#4CBB17");
+
         this._inputConfirmationButton = new visual.ButtonStim({
             win: this._psychoJS.window,
             text: "Дальше",
             pos: screenSizeAdapter.rescalePosition([0, -0.35]),
             letterHeight: screenSizeAdapter.rescaleTextSize(0.05),
             size: screenSizeAdapter.rescaleElementSize([0.17, 0.03]),
-            fillColor: new util.Color("#999999"),
+            fillColor: this._inactiveButtonColor,
         });
     }
 
     initilize(taskConditions) {
+        this._checkRating = taskConditions.checkRating;
+
         this._slider.reset();
-        this._inputConfirmationButton.fillColor = new util.Color("#999999");
+        this._inputConfirmationButton.fillColor = this._inactiveButtonColor;
         this._isInitilized = true;
         this._slider.setAutoDraw(true);
         this._inputConfirmationButton.setAutoDraw(true);
@@ -385,11 +391,11 @@ class SliderInput extends UserInputProcessor {
     isSendInput() {
         const rating = this._slider.getRating();
 
-        if (rating === undefined) {
+        if (this._checkRating && rating === undefined) {
             return false;
         }
 
-        this._inputConfirmationButton.fillColor = new util.Color("#4CBB17");
+        this._inputConfirmationButton.fillColor = this._activeButtonColor;
         return this._inputConfirmationButton.isClicked;
     }
 
@@ -567,7 +573,7 @@ class InstructionGenerator {
         loopScheduler,
     }) {
         this._showInstruction = showInstruction;
-        this._when = when;
+        this._when = cumsum([0, ...when.slice(0, -1)]);
         this._instructionsText = instructionsText;
         this._instructionRoutine = instructionRoutine;
         this._loopScheduler = loopScheduler;
@@ -589,7 +595,7 @@ class InstructionGenerator {
             return;
         }
 
-        if (nTrial === this._when[this._instructionIdx] || nTrial === 0) {
+        if (nTrial === this._when[this._instructionIdx]) {
             this._loopScheduler.add(
                 this._instructionRoutine(
                     this._instructionsText[this._instructionIdx]
@@ -846,6 +852,13 @@ function sum(array) {
     return array.reduce((total, current) => total + current, 0);
 }
 
+function cumsum(array) {
+    return array.reduce(
+        (acc, curr, i) => [...acc, curr + (acc[i - 1] || 0)],
+        []
+    );
+}
+
 export {
     AdditionalTrialData,
     ExperimentOrganizer,
@@ -862,4 +875,5 @@ export {
     choice,
     choices,
     cartesian,
+    cumsum,
 };
