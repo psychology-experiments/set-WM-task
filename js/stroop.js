@@ -177,7 +177,7 @@ class StroopTestPresenter extends TaskPresenter {
         attemptData = Object.assign(attemptData, inputData);
 
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
-        this._trial_finished = true;
+        this._trialFinished = true;
     }
 
     nextStimulus() {
@@ -192,7 +192,7 @@ class StroopTestPresenter extends TaskPresenter {
 
         this._currentStimuli = this._stimuli[this._part].pop();
         this._view.setStroopWord(this._currentStimuli.name);
-        this._trial_finished = false;
+        this._trialFinished = false;
     }
 
     stop() {
@@ -204,7 +204,7 @@ class StroopTestPresenter extends TaskPresenter {
     }
 
     isTrialFinished() {
-        return this._trial_finished;
+        return this._trialFinished;
     }
 
     addUnfinishedTrialData(userInputProcessor) {

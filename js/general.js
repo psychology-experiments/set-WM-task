@@ -47,7 +47,7 @@ class TaskPresenter {
         }
         this._view = view;
 
-        this._trial_finished = false;
+        this._trialFinished = false;
         this._solutionAttemptsKeeper = new SolutionAttemptsKeeper();
     }
 
@@ -75,7 +75,7 @@ class TaskPresenter {
     }
 
     addUnfinishedTrialData(userInputProcessor) {
-        if (this._trial_finished) {
+        if (this._trialFinished) {
             return;
         }
         // throw new Error(`Method 'addUnfinishedTrialData(userInputProcessor)' must be implemented in ${this.name} class.`);

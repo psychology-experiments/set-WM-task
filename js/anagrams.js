@@ -85,11 +85,11 @@ class AnagramsPresenter extends TaskPresenter {
 
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
         userInputProcessor.clearInput();
-        this._trial_finished = isCorrectAnswer;
+        this._trialFinished = isCorrectAnswer;
     }
 
     addUnfinishedTrialData(userInputProcessor) {
-        if (this._trial_finished) {
+        if (this._trialFinished) {
             return;
         }
 
@@ -112,7 +112,7 @@ class AnagramsPresenter extends TaskPresenter {
     }
 
     nextStimulus() {
-        this._trial_finished = false;
+        this._trialFinished = false;
         this._currentStimulus = this._anagrams.pop();
         this._view.setAnagram(this._currentStimulus.anagram);
     }
@@ -123,7 +123,7 @@ class AnagramsPresenter extends TaskPresenter {
             return true;
         }
 
-        return this._trial_finished;
+        return this._trialFinished;
     }
 
     isTaskFinished() {
