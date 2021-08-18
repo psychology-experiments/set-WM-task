@@ -66,7 +66,7 @@ class TaskPresenter {
     stop() {
         if (!this._solutionAttemptsKeeper.wasCalled()) {
             throw new Error(
-                "After EACH trial SolutionAttemptsKeeper must be called at least to save attempt data."
+                "After EACH trial SolutionAttemptsKeeper must be called at least once to save attempt data."
             );
         }
 
