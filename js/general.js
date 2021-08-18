@@ -392,9 +392,9 @@ class SliderInput extends UserInputProcessor {
     }
 
     isSendInput() {
-        // if (!this._checkRating) {
-        //     return true;
-        // }
+        if (!this._checkRating) {
+            return true;
+        }
 
         const rating = this._slider.getRating();
 
