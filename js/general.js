@@ -146,10 +146,16 @@ class TaskView {
 class SolutionAttemptsKeeper {
     constructor() {
         this._attempts = [];
+        this._skip = false;
     }
 
     saveAttempt(attemptData) {
+        this._skip = false;
         this._attempts.push(attemptData);
+    }
+
+    skipAttempt() {
+        this._skip = true;
     }
 
     getAttempts() {
@@ -161,7 +167,7 @@ class SolutionAttemptsKeeper {
     }
 
     wasCalled() {
-        return this._attempts.length > 0;
+        return this._attempts.length > 0 || this._skip;
     }
 }
 

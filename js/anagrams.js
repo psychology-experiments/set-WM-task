@@ -57,7 +57,7 @@ class AnagramsPresenter extends TaskPresenter {
         for (let [answer, anagram] of anagrams) {
             anagramsArray.push(new SingleAnagram({ answer, anagram }));
         }
-        return util.shuffle(anagramsArray);
+        return util.shuffle(Array.from(anagramsArray));
     }
 
     getTaskConditions() {

@@ -138,7 +138,7 @@ class StroopTestPresenter extends TaskPresenter {
         let congruentSet = choices(this._words.congruent, 10);
         let inCongruentSet = choices(this._words.incongruent, 50);
         let wordsSet = congruentSet.concat(inCongruentSet);
-        return util.shuffle(wordsSet);
+        return util.shuffle(Array.from(wordsSet));
     }
 
     *_getStimuliInfo() {
