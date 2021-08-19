@@ -96,6 +96,8 @@ class ScaleGenerationPart {
         return this._taskView.isButtonPressed("stopGeneration");
     }
 
+    _stopGeneration() {}
+
     _updateGenerateMoreButtonStatus() {
         const toDeactivate =
             this._scaleFilled && !this._generationButtonsStatusCanBePressed;
@@ -134,7 +136,10 @@ class ScaleGenerationPart {
     getCurrentScale() {
         if (this._isStopGeneration()) {
             this._stopGeneration = true;
-            return null;
+
+            if (!this._scaleFilled) {
+                return null;
+            }
         }
 
         const info = this._taskView.getEmptyScaleInfo();
