@@ -107,6 +107,10 @@ class TaskPresenter {
         );
     }
 
+    isToSkipInstruction() {
+        return false;
+    }
+
     isTrialFinished() {
         throw new Error(
             `Method 'isTrialFinished()' must be implemented in ${this.name} class.`
@@ -578,45 +582,31 @@ class Instruction {
 }
 
 class InstructionGenerator {
-    constructor({
-        showInstruction,
-        when,
-        instructionRoutine,
-        instructionsText,
-        loopScheduler,
-    }) {
+    constructor({ showInstruction, instructionRoutine, instructionsText }) {
         this._showInstruction = showInstruction;
-        this._when = cumsum([0, ...when.slice(0, -1)]);
         this._instructionsText = instructionsText;
         this._instructionRoutine = instructionRoutine;
-        this._loopScheduler = loopScheduler;
 
-        this._instructions_qty = instructionsText.length;
-        this._instructionIdx = 0;
-
-        if (this._instructions_qty !== this._when.length) {
-            throw new Error("Quantity of instructions and loops are different");
-        }
+        this._instructionsIdx = 0;
     }
 
-    generateInstruction(nTrial) {
+    generateInstructionRoutine(task) {
         if (!this._showInstruction) {
             return;
         }
 
-        if (this._instructions_qty === 0) {
-            return;
+        if (this._instructionsIdx >= this._instructionsText.length) {
+            throw new Error(
+                "Asked to generate more instructions than task have."
+            );
         }
 
-        if (nTrial === this._when[this._instructionIdx]) {
-            this._loopScheduler.add(
-                this._instructionRoutine(
-                    this._instructionsText[this._instructionIdx]
-                )
-            );
-            this._instructions_qty -= 1;
-            this._instructionIdx += 1;
-        }
+        const instructionRoutine = this._instructionRoutine(
+            this._instructionsText[this._instructionsIdx],
+            task
+        );
+        this._instructionsIdx += 1;
+        return instructionRoutine;
     }
 }
 
@@ -631,6 +621,7 @@ class ExperimentOrganizer {
         showOnly,
         showInstructions,
     }) {
+        this.NAME = "NAAAAAAAAAME";
         this._psychoJS = psychoJS;
         this._experimentScheduler = experimentScheduler;
         this._parts = parts;
@@ -654,18 +645,19 @@ class ExperimentOrganizer {
         return sum(nLoops) > 0;
     }
 
-    _generateLoopBegin(
+    _generateLoop(
         loopScheduler,
+        instructionGenerator,
         taskRoutines,
         routineSettings,
-        showInstructions
+        nReps
     ) {
         // TODO: change generator to create new trial for every loop breakpoint
 
         // set up handler to look after randomisation of conditions etc
         let trials = new data.TrialHandler({
             psychoJS: this._psychoJS,
-            nReps: sum(routineSettings.nLoops),
+            nReps: nReps,
             method: data.TrialHandler.Method.RANDOM,
             originPath: undefined,
             trialList: undefined,
@@ -673,19 +665,16 @@ class ExperimentOrganizer {
             name: [routineSettings.task.name + "Trials"],
         });
 
-        let instructionGenerator = new InstructionGenerator({
-            showInstruction: showInstructions,
-            when: routineSettings.nLoops,
-            instructionRoutine: taskRoutines.instruction,
-            instructionsText: routineSettings.task.instructions,
-            loopScheduler: loopScheduler,
-        });
-
         this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
 
+        // adds instructions to tasks
+        loopScheduler.add(
+            instructionGenerator.generateInstructionRoutine(
+                routineSettings.task
+            )
+        );
         for (const thisTrial of trials) {
             const snapshot = trials.getSnapshot();
-            instructionGenerator.generateInstruction(snapshot.thisN);
             for (const routine of taskRoutines.routines) {
                 loopScheduler.add(
                     routine(
@@ -697,29 +686,41 @@ class ExperimentOrganizer {
             }
             loopScheduler.add(taskRoutines.loop(loopScheduler, snapshot));
         }
+
+        // remove finished loops
+        this._psychoJS.experiment.removeLoop(trials);
         return util.Scheduler.Event.NEXT;
     }
 
-    _generateLoopEnd() {
-        // this._psychoJS.experiment.removeLoop(trials);
-        return util.Scheduler.Event.NEXT;
+    _generateLoopedRoutine(routineSettings) {
+        const instructionGenerator = new InstructionGenerator({
+            showInstruction: this._showInstructions,
+            when: routineSettings.nLoops,
+            instructionRoutine: this._routines.instruction,
+            instructionsText: routineSettings.task.instructions,
+        });
+
+        for (let nLoops of routineSettings.nLoops) {
+            // trialsLoopScheduler controls looped routine
+            const trialsLoopScheduler = new util.Scheduler(this._psychoJS);
+
+            // add routines to loop
+            this._experimentScheduler.add(
+                this._generateLoop.bind(this),
+                trialsLoopScheduler,
+                instructionGenerator,
+                this._routines,
+                routineSettings,
+                nLoops
+            );
+
+            // add generated loops with routines
+            this._experimentScheduler.add(trialsLoopScheduler);
+        }
     }
 
     _generateSingleRoutine(routineSettings) {
         this._experimentScheduler.add(routineSettings.task());
-    }
-
-    _generateLoopedRoutine(routineSettings) {
-        const trialsLoopScheduler = new util.Scheduler(this._psychoJS);
-        this._experimentScheduler.add(
-            this._generateLoopBegin,
-            trialsLoopScheduler,
-            this._routines,
-            routineSettings,
-            this._showInstructions
-        );
-        this._experimentScheduler.add(trialsLoopScheduler);
-        this._experimentScheduler.add(this._generateLoopEnd);
     }
 
     generateExperimentSequence() {
