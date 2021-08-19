@@ -268,7 +268,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "anagrams",
+        showOnly: "dembo-rubinstein",
         showInstructions: true,
     });
 
