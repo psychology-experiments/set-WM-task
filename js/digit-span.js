@@ -1,5 +1,7 @@
 import { util, visual } from "../lib/psychojs-2021.2.2.js";
 
+import { TaskPresenter, TaskView, Instruction } from "./general.js";
+
 const instruction = `
 Сейчас тебе будут предъявляться числа, которые нужно запомнить. 
 После показа всех чисел появится одна из инструкций:
