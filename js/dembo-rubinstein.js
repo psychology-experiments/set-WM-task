@@ -317,7 +317,6 @@ class DemboRubinsteinPresenter extends TaskPresenter {
 
     nextStimulus() {
         if (this._isAllPartsFinished()) {
-            console.log("FINISHED ALL");
             return;
         }
 
@@ -327,7 +326,6 @@ class DemboRubinsteinPresenter extends TaskPresenter {
             this._nextPart();
         }
 
-        console.log("NAME", this._partName);
         this._partScales.setNextScale();
     }
 
