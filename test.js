@@ -76,7 +76,7 @@ var frameDur;
 function updateInfo() {
     expInfo.date = util.MonotonicClock.getDateStr(); // add a simple timestamp
     expInfo.expName = expName;
-    expInfo.psychopyVersion = "2021.1.4";
+    expInfo.psychopyVersion = "2021.2.2";
     expInfo.OS = window.navigator.platform;
 
     // store frame rate of monitor if we can measure it successfully
@@ -225,7 +225,7 @@ function experimentInit() {
             task: demboRubinstein,
             userInputProcessor: sliderInput,
             isForExperiment: true,
-            nLoops: [6, 10, 10, 10],
+            nLoops: [6, 100, 100, 100],
         },
         "digit span": {
             task: digitSpan,
@@ -268,7 +268,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "dembo-rubinstein",
+        showOnly: "anagrams",
         showInstructions: true,
     });
 
@@ -283,7 +283,7 @@ function developerMessage(snapshot) {
         win: psychoJS.window,
         color: new util.Color("black"),
         height: 0.05,
-        text: 'Код находится в процессе разработки.\nДля переключения между задачами используйте клавишу "q"',
+        text: "Код находится в процессе разработки.\nДля переключения между задачами используйте * на клавиатуре с цифрами (там ещё Num Lock клавиша)",
         wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
     });
     return function () {
@@ -298,8 +298,12 @@ function developerMessage(snapshot) {
     };
 }
 
-function instructionRoutine(instructionText) {
+function instructionRoutine(instructionText, task) {
     return function () {
+        if (task.isToSkipInstruction()) {
+            return Scheduler.Event.NEXT;
+        }
+
         if (instructionPresenter.status === PsychoJS.Status.NOT_STARTED) {
             instructionPresenter.text = instructionText;
             instructionPresenter.status = PsychoJS.Status.STARTED;
@@ -323,8 +327,10 @@ function instructionRoutine(instructionText) {
 function taskRoutineBegin(snapshot, task, userInputProcessor) {
     return function () {
         console.count("begin");
+
         task.nextStimulus();
         routineClock.reset();
+
         return util.Scheduler.Event.NEXT;
     };
 }
@@ -369,7 +375,8 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
         // Developer's option to look on different tasks
         if (
             experimentSequence.isInDevelopment &&
-            psychoJS.eventManager.getKeys({ keyList: ["q"] }).length > 0
+            psychoJS.eventManager.getKeys({ keyList: ["num_multiply"] })
+                .length > 0
         ) {
             snapshot.finished = true;
             return Scheduler.Event.NEXT;
