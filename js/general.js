@@ -154,7 +154,6 @@ class SolutionAttemptsKeeper {
     }
 
     saveAttempt(attemptData) {
-        this._skip = false;
         this._attempts.push(attemptData);
     }
 
@@ -167,6 +166,7 @@ class SolutionAttemptsKeeper {
     }
 
     clear() {
+        this._skip = false;
         this._attempts = [];
     }
 
