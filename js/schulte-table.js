@@ -41,8 +41,14 @@ class OneColorSchulteProgress {
         this._currentStep = 1;
     }
 
-    checkAnswer({ answer }) {
-        if (answer === this._currentStep) {
+    checkAnswer({ answerNumber, answerColor }) {
+        if (answerColor !== "black") {
+            throw new Error(
+                "SchulteProgress for BLACK table used in Black and Red table"
+            );
+        }
+
+        if (answerNumber === this._currentStep) {
             this._currentStep += 1;
             return true;
         }
