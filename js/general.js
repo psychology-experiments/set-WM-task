@@ -239,30 +239,46 @@ class UserInputProcessor {
     }
 }
 
-class SingleMouseClick extends UserInputProcessor {
-    constructor(additionalTrialData) {
-        super({ inputType: "SingleMouseClick", additionalTrialData });
-        this._isPressed = false;
+class SingleClickMouse extends UserInputProcessor {
+    constructor({ psychoJS, additionalTrialData, buttonToCheck }) {
+        super({
+            inputType: "SingleMouseClick",
+            additionalTrialData: additionalTrialData,
+        });
+        this._isPressed = true;
         this._timePressed = null;
+
+        const buttons = { left: 0, center: 1, right: 2 };
+        this._checkButton = buttons[buttonToCheck];
+
+        this._mouse = new core.Mouse({ win: psychoJS.window });
     }
 
-    get timePressed() {
-        return this._timePressed;
+    initilize(taskConditions) {
+        this._isInitilized = true;
+        this._isPressed = true;
+        this._timePressed = null;
+        this._mouse.clickReset([this._checkButton]);
     }
 
-    getButtonPress(mouse, button) {
-        let clickInfo = mouse.getPressed(true);
+    stop() {
+        this._isInitilized = false;
+    }
+
+    _getButtonPress() {
+        let getTime = true;
+        let clickInfo = this._mouse.getPressed(getTime);
         return {
-            isPressed: clickInfo[0][button],
-            timePressed: clickInfo[1][button],
+            isPressed: clickInfo[0][this._checkButton],
+            timePressed: clickInfo[1][this._checkButton],
         };
     }
 
-    isSingleClick(mouse, button) {
-        let click = this.getButtonPress(mouse, button);
+    _isSingleClick() {
+        let click = this.getButtonPress();
 
         if (click.isPressed && !this._isPressed) {
-            mouse.clickReset([0]);
+            this._mouse.clickReset([this._checkButton]);
             this._isPressed = true;
             this._timePressed = click.timePressed;
             return true;
@@ -274,6 +290,29 @@ class SingleMouseClick extends UserInputProcessor {
         }
 
         return false;
+    }
+
+    isSendInput() {
+        return this._isSingleClick();
+    }
+
+    getData() {
+        const inputData = {
+            mouse: this._mouse,
+            RT: this._timePressed,
+        };
+
+        return this._additionalTrialData.addData(inputData);
+    }
+
+    showInputError() {
+        throw new Error(
+            `Method 'showInputError()' must be implemented in ${this.inputType}.`
+        );
+    }
+
+    clearInput() {
+        return;
     }
 }
 
@@ -881,7 +920,7 @@ export {
     SingleSymbolKeyboard,
     SolutionAttemptsKeeper,
     WordInputProcessor,
-    SingleMouseClick,
+    SingleClickMouse,
     SliderInput,
     ScreenHeightRescaler,
     TaskPresenter,
