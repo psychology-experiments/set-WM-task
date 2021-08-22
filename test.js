@@ -105,10 +105,10 @@ var digitSpan;
 var instructionPresenter;
 var globalClock;
 var routineClock;
-var mouse;
 var keyboard;
 var wordInputProcessor;
 var sliderInput;
+var singleClickMouse;
 var screenHeightRescaler;
 var additionalDataHandler;
 var dataSaver;
@@ -123,15 +123,21 @@ function experimentInit() {
     onlyBlackSchulteTable = new SchulteTable({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        side: 0.032,
+        startTime: 1.0,
+        sideSize: 0.032,
         squaresNumber: 25,
+        position: [0, 0],
+        squareNumberColor: "black",
     });
 
     blackAndRedSchulteTable = new SchulteTable({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        side: 0.016,
+        startTime: 1.0,
+        sideSize: 0.016,
         squaresNumber: 49,
+        position: [0, 0],
+        squareNumberColor: "red",
     });
 
     stroop = new StroopTest({
@@ -178,7 +184,11 @@ function experimentInit() {
         timeFromExperimentStart: () => globalClock.getTime(),
     });
 
-    mouse = new core.Mouse({ win: psychoJS.window });
+    singleClickMouse = new general.SingleClickMouse({
+        psychoJS: psychoJS,
+        additionalTrialData: additionalDataHandler,
+        buttonToCheck: "left",
+    });
 
     keyboard = new general.SingleSymbolKeyboard({
         psychoJS: psychoJS,
@@ -235,15 +245,15 @@ function experimentInit() {
         },
         "black schulte": {
             task: onlyBlackSchulteTable,
-            userInputProcessor: null,
+            userInputProcessor: singleClickMouse,
             isForExperiment: true,
-            nLoops: [0],
+            nLoops: [5],
         },
         "black and red schulte": {
             task: blackAndRedSchulteTable,
-            userInputProcessor: null,
+            userInputProcessor: singleClickMouse,
             isForExperiment: true,
-            nLoops: [0],
+            nLoops: [1, 1, 1],
         },
         anagrams: {
             task: anagrams,
@@ -268,7 +278,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "dembo-rubinstein",
+        showOnly: "black schulte",
         showInstructions: true,
     });
 
