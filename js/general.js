@@ -275,7 +275,7 @@ class SingleClickMouse extends UserInputProcessor {
     }
 
     _isSingleClick() {
-        let click = this.getButtonPress();
+        let click = this._getButtonPress();
 
         if (click.isPressed && !this._isPressed) {
             this._mouse.clickReset([this._checkButton]);
