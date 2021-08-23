@@ -123,21 +123,23 @@ function experimentInit() {
     onlyBlackSchulteTable = new SchulteTable({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        startTime: 1.0,
-        sideSize: 0.032,
+        startTime: 0, // 1.0
+        sideSize: 0.16,
         squaresNumber: 25,
         position: [0, 0],
-        squareNumberColor: "black",
+        squareNumberColor: ["black"],
+        nTables: 5,
     });
 
     blackAndRedSchulteTable = new SchulteTable({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        startTime: 1.0,
-        sideSize: 0.016,
+        startTime: 0, // 1.0
+        sideSize: 0.1,
         squaresNumber: 49,
         position: [0, 0],
-        squareNumberColor: "red",
+        squareNumberColor: ["black", "red"],
+        nTables: 3,
     });
 
     stroop = new StroopTest({
@@ -278,7 +280,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "black schulte",
+        showOnly: "black and red schulte",
         showInstructions: true,
     });
 
@@ -389,6 +391,7 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
                 .length > 0
         ) {
             snapshot.finished = true;
+            task.skipTask();
             return Scheduler.Event.NEXT;
         }
 
