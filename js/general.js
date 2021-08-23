@@ -27,7 +27,7 @@ class TaskPresenter {
         }
         if (!Array.isArray(instructionsText)) {
             throw new Error(
-                "instructionText attribute must be Array with string(s)"
+                "instructionText attribute must be Array with instance(s) of Instruction from 'general' module"
             );
         }
         if (
@@ -79,6 +79,12 @@ class TaskPresenter {
             return;
         }
         // throw new Error(`Method 'addUnfinishedTrialData(userInputProcessor)' must be implemented in ${this.name} class.`);
+    }
+
+    skipTask() {
+        this._trialFinished = true;
+        this.isTaskFinished = () => true;
+        this._solutionAttemptsKeeper.skipAttempt();
     }
 
     getTrialData() {
@@ -872,6 +878,10 @@ class ScreenHeightRescaler {
 
     rescaleTextSize(originalTextSize) {
         return originalTextSize;
+    }
+
+    rescaleElementLength(originalLength) {
+        return originalLength;
     }
 
     rescaleWrapWidth(originalWrapWidth) {
