@@ -288,7 +288,6 @@ class SingleClickMouse extends UserInputProcessor {
 
         if (click.isPressed && !this._isPressed) {
             this._isPressed = true;
-            console.log(click.timePressed);
             this._timePressed = click.timePressed;
             return true;
         }
