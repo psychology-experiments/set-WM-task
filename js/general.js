@@ -668,7 +668,6 @@ class ExperimentOrganizer {
         showOnly,
         showInstructions,
     }) {
-        this.NAME = "NAAAAAAAAAME";
         this._psychoJS = psychoJS;
         this._experimentScheduler = experimentScheduler;
         this._parts = parts;
@@ -780,6 +779,23 @@ class ExperimentOrganizer {
                 this._isShowOnlyOneTask(part) &&
                 this._isToShowDelopment(settings)
         );
+
+        if (this._showOnly === null) {
+            routines.sort((a, b) => {
+                let aValue = this._tasksAtTheBeginning.indexOf(a);
+                let bValue = this._tasksAtTheBeginning.indexOf(b);
+
+                if (aValue === -1) {
+                    aValue = Math.random() + this._tasksAtTheBeginning.length;
+                }
+
+                if (bValue === -1) {
+                    aValue = Math.random() + this._tasksAtTheBeginning.length;
+                }
+
+                return aValue - bValue;
+            });
+        }
 
         for (let [part, settings] of routines) {
             if (this._isLoopedRoutine(settings.nLoops)) {
