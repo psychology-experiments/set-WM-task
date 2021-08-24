@@ -203,6 +203,11 @@ class StroopTestPresenter extends TaskPresenter {
         }
     }
 
+    skipTask() {
+        super.skipTask();
+        this._view.showHint(false);
+    }
+
     isTrialFinished() {
         return this._trialFinished;
     }
