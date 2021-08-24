@@ -219,7 +219,7 @@ function experimentInit() {
         "developer message": {
             routine: developerMessage,
             isForExperiment: false,
-            nLoops: 0,
+            nLoops: [0],
         },
         stroop: {
             task: stroop,
@@ -227,24 +227,24 @@ function experimentInit() {
             isForExperiment: true,
             nLoops: [60, 60],
         },
-        luchins: {
-            task: luchins,
-            userInputProcessor: null,
-            isForExperiment: true,
-            nLoops: [0],
-        },
+        // luchins: {
+        //     task: luchins,
+        //     userInputProcessor: null,
+        //     isForExperiment: true,
+        //     nLoops: [0],
+        // },
         "dembo-rubinstein": {
             task: demboRubinstein,
             userInputProcessor: sliderInput,
             isForExperiment: true,
             nLoops: [6, 100, 100, 100],
         },
-        "digit span": {
-            task: digitSpan,
-            userInputProcessor: null,
-            isForExperiment: true,
-            nLoops: [0],
-        },
+        // "digit span": {
+        //     task: digitSpan,
+        //     userInputProcessor: null,
+        //     isForExperiment: true,
+        //     nLoops: [0],
+        // },
         "black schulte": {
             task: onlyBlackSchulteTable,
             userInputProcessor: singleClickMouse,
@@ -280,7 +280,8 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        showOnly: "black and red schulte",
+        // showOnly: "black and red schulte",
+        showOnly: null,
         showInstructions: true,
     });
 
@@ -301,7 +302,10 @@ function developerMessage(snapshot) {
     return function () {
         developerInstruction.draw();
         // Developer's option to look on different tasks
-        if (psychoJS.eventManager.getKeys({ keyList: ["q"] }).length > 0) {
+        if (
+            psychoJS.eventManager.getKeys({ keyList: ["num_multiply"] })
+                .length > 0
+        ) {
             developerInstruction.setAutoDraw(false);
             return Scheduler.Event.NEXT;
         }
