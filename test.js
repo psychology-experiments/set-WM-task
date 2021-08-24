@@ -123,7 +123,7 @@ function experimentInit() {
     onlyBlackSchulteTable = new SchulteTable({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        startTime: 0, // 1.0
+        startTime: 1.0,
         sideSize: 0.16,
         squaresNumber: 25,
         position: [0, 0],
@@ -134,7 +134,7 @@ function experimentInit() {
     blackAndRedSchulteTable = new SchulteTable({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        startTime: 0, // 1.0
+        startTime: 1.0,
         sideSize: 0.1,
         squaresNumber: 49,
         position: [0, 0],
