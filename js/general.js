@@ -258,13 +258,15 @@ class SingleClickMouse extends UserInputProcessor {
         this._checkButton = buttons[buttonToCheck];
 
         this._mouse = new core.Mouse({ win: psychoJS.window });
+        this._mouse.leftButtonClock = new util.Clock();
     }
 
     initilize(taskConditions) {
+        this._mouse.leftButtonClock.reset();
+
         this._isInitilized = true;
         this._isPressed = true;
         this._timePressed = null;
-        this._mouse.clickReset([this._checkButton]);
     }
 
     stop() {
@@ -274,9 +276,10 @@ class SingleClickMouse extends UserInputProcessor {
     _getButtonPress() {
         let getTime = true;
         let clickInfo = this._mouse.getPressed(getTime);
+
         return {
             isPressed: clickInfo[0][this._checkButton],
-            timePressed: clickInfo[1][this._checkButton],
+            timePressed: this._mouse.leftButtonClock.getTime(),
         };
     }
 
@@ -284,8 +287,8 @@ class SingleClickMouse extends UserInputProcessor {
         let click = this._getButtonPress();
 
         if (click.isPressed && !this._isPressed) {
-            this._mouse.clickReset([this._checkButton]);
             this._isPressed = true;
+            console.log(click.timePressed);
             this._timePressed = click.timePressed;
             return true;
         }
@@ -318,7 +321,7 @@ class SingleClickMouse extends UserInputProcessor {
     }
 
     clearInput() {
-        return;
+        this._mouse.leftButtonClock.reset();
     }
 }
 
