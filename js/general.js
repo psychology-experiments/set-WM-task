@@ -766,7 +766,7 @@ class ExperimentOrganizer {
     }
 
     _generateSingleRoutine(routineSettings) {
-        this._experimentScheduler.add(routineSettings.task());
+        this._experimentScheduler.add(routineSettings.routine());
     }
 
     generateExperimentSequence() {
@@ -782,15 +782,15 @@ class ExperimentOrganizer {
 
         if (this._showOnly === null) {
             routines.sort((a, b) => {
-                let aValue = this._tasksAtTheBeginning.indexOf(a);
-                let bValue = this._tasksAtTheBeginning.indexOf(b);
+                let aValue = this._tasksAtTheBeginning.indexOf(a[0]);
+                let bValue = this._tasksAtTheBeginning.indexOf(b[0]);
 
                 if (aValue === -1) {
                     aValue = Math.random() + this._tasksAtTheBeginning.length;
                 }
 
                 if (bValue === -1) {
-                    aValue = Math.random() + this._tasksAtTheBeginning.length;
+                    bValue = Math.random() + this._tasksAtTheBeginning.length;
                 }
 
                 return aValue - bValue;
