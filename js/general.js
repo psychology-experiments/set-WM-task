@@ -769,6 +769,30 @@ class ExperimentOrganizer {
         this._experimentScheduler.add(routineSettings.routine());
     }
 
+    _shuffleRoutines(routines) {
+        const routinesOrder = {};
+
+        for (let [routineName, _] of routines) {
+            let index = this._tasksAtTheBeginning.indexOf(routineName);
+
+            if (index === -1) {
+                index = Math.random() + this._tasksAtTheBeginning.length;
+            }
+
+            routinesOrder[routineName] = index;
+        }
+
+        return routines.sort((routine1, routine2) => {
+            const routine1Name = routine1[0];
+            const routine2Name = routine2[0];
+
+            const routine1Value = routinesOrder[routine1Name];
+            const routine2Value = routinesOrder[routine2Name];
+
+            return routine1Value - routine2Value;
+        });
+    }
+
     generateExperimentSequence() {
         if (this._parts === null) {
             throw new Error("Experiment Parts are not defined");
@@ -781,20 +805,7 @@ class ExperimentOrganizer {
         );
 
         if (this._showOnly === null) {
-            routines.sort((a, b) => {
-                let aValue = this._tasksAtTheBeginning.indexOf(a[0]);
-                let bValue = this._tasksAtTheBeginning.indexOf(b[0]);
-
-                if (aValue === -1) {
-                    aValue = Math.random() + this._tasksAtTheBeginning.length;
-                }
-
-                if (bValue === -1) {
-                    bValue = Math.random() + this._tasksAtTheBeginning.length;
-                }
-
-                return aValue - bValue;
-            });
+            this._shuffleRoutines(routines);
         }
 
         for (let [part, settings] of routines) {
