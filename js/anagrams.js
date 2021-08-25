@@ -77,6 +77,7 @@ class AnagramsPresenter extends TaskPresenter {
             task: this.name,
             anagram: this._currentStimulus.anagram,
             rightAnswer: this._currentStimulus.answer,
+            participantAnswer: participantAnswer,
             isCorrect: isCorrectAnswer ? 1 : 0,
             solved: isCorrectAnswer ? 1 : 0,
         };
