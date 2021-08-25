@@ -107,9 +107,9 @@ class TaskPresenter {
         );
     }
 
-    checkInput(inputProcessor) {
+    checkInput(userInputProcessor) {
         throw new Error(
-            `Method 'checkInput(inputProcessor)' must be implemented in ${this.name} class.`
+            `Method 'checkInput(userInputProcessor)' must be implemented in ${this.name} class.`
         );
     }
 
