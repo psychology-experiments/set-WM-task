@@ -347,6 +347,7 @@ function instructionRoutine(instructionText, task) {
         ) {
             instructionPresenter.setAutoDraw(false);
             instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
+            psychoJS.eventManager.clearEvents();
             return Scheduler.Event.NEXT;
         }
 
