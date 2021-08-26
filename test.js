@@ -107,6 +107,7 @@ var globalClock;
 var routineClock;
 var keyboard;
 var wordInputProcessor;
+var digitInputProcessor;
 var sliderInput;
 var singleClickMouse;
 var screenHeightRescaler;
@@ -167,6 +168,9 @@ function experimentInit() {
     digitSpan = new DigitSpan({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
+        startTime: 0.3, // In seconds
+        digitPresentationTime: 1000, // In ms
+        maskTime: 100, // In ms
     });
 
     instructionPresenter = new visual.TextStim({
@@ -197,10 +201,20 @@ function experimentInit() {
         additionalTrialData: additionalDataHandler,
     });
 
-    wordInputProcessor = new general.WordInputProcessor({
+    wordInputProcessor = new general.TextInputProcessor({
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
         screenSizeAdapter: screenHeightRescaler,
+        symbolsDelimiter: "",
+        allowedSymbolsType: "russian letters",
+    });
+
+    digitInputProcessor = new general.TextInputProcessor({
+        psychoJS: psychoJS,
+        additionalTrialData: additionalDataHandler,
+        screenSizeAdapter: screenHeightRescaler,
+        symbolsDelimiter: " ",
+        allowedSymbolsType: "digits",
     });
 
     sliderInput = new general.SliderInput({
@@ -239,12 +253,12 @@ function experimentInit() {
             isForExperiment: true,
             nLoops: [6, 100, 100, 100],
         },
-        // "digit span": {
-        //     task: digitSpan,
-        //     userInputProcessor: null,
-        //     isForExperiment: true,
-        //     nLoops: [0],
-        // },
+        "digit span": {
+            task: digitSpan,
+            userInputProcessor: digitInputProcessor,
+            isForExperiment: true,
+            nLoops: [100000],
+        },
         "black schulte": {
             task: onlyBlackSchulteTable,
             userInputProcessor: singleClickMouse,
@@ -280,7 +294,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        // showOnly: "black and red schulte",
+        // showOnly: "digit span",
         showOnly: null,
         showInstructions: true,
     });
