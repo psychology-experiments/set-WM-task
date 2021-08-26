@@ -531,7 +531,7 @@ class TextInputProcessor extends UserInputProcessor {
     }
 
     _generateRegExp(allowedSymbolsType) {
-        const symbolsTypes = { digits: "\\d", letters: "\\w" };
+        const symbolsTypes = { digits: "\\d", "russian letters": "[а-я]" };
         const regExp = symbolsTypes[allowedSymbolsType];
 
         if (regExp === undefined) {
