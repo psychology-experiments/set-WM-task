@@ -483,9 +483,18 @@ class SliderInput extends UserInputProcessor {
     }
 }
 
-class WordInputProcessor extends UserInputProcessor {
-    constructor({ psychoJS, additionalTrialData, screenSizeAdapter }) {
+class TextInputProcessor extends UserInputProcessor {
+    constructor({
+        psychoJS,
+        additionalTrialData,
+        screenSizeAdapter,
+        symbolsDelimiter,
+        allowedSymbolsType,
+    }) {
         super({ inputType: "WordInputProcessor", additionalTrialData });
+
+        this._inputWindowSizeForOneCharacter =
+            screenSizeAdapter.rescaleElementSize([0.04, 0.2]);
         this._inputWindow = new visual.TextBox({
             win: psychoJS.window,
             name: "textbox",
@@ -493,7 +502,7 @@ class WordInputProcessor extends UserInputProcessor {
             font: "Open Sans",
             pos: screenSizeAdapter.rescalePosition([0, -0.1]),
             letterHeight: screenSizeAdapter.rescaleTextSize(0.1),
-            size: screenSizeAdapter.rescaleElementSize([0.3, 0.2]),
+            size: this._inputWindowSizeForOneCharacter,
             color: "black",
             colorSpace: "rgb",
             fillColor: "lightgrey",
@@ -516,52 +525,81 @@ class WordInputProcessor extends UserInputProcessor {
 
         this._currentLength = 0;
         this._maxLength = null;
+
+        this._symbolsDelimiter = symbolsDelimiter;
+        this._allowedSymbols = this._generateRegExp(allowedSymbolsType);
+    }
+
+    _generateRegExp(allowedSymbolsType) {
+        const symbolsTypes = { digits: "\\d", letters: "\\w" };
+        const regExp = symbolsTypes[allowedSymbolsType];
+
+        if (regExp === undefined) {
+            throw new Error(
+                `${allowedSymbolsType} is not supported. Use one of these [${Object.keys(
+                    symbolsTypes
+                ).join(", ")}]`
+            );
+        }
+
+        return new RegExp(regExp, "g");
     }
 
     initilize(taskConditions) {
-        this._clearInput();
+        this.clearInput();
 
         if (typeof taskConditions.maxInputLength === "undefined") {
             throw new Error("MaxInputLength must be defined.");
         }
 
+        let inputAllowedStartTime = taskConditions.inputAllowedStartTime || 0;
+        setTimeout(
+            () => this._inputWindow.setAutoDraw(true),
+            inputAllowedStartTime
+        );
+
         this._maxLength = taskConditions.maxInputLength;
-        this._inputWindow.setAutoDraw(true);
+        this._fitInputWindow();
         this._isInitilized = true;
         this._inputWindow.refresh();
     }
 
+    _fitInputWindow() {
+        const oneDelimeterLength = this._symbolsDelimiter.length;
+        const delimitersLength = oneDelimeterLength * (this._maxLength - 1);
+
+        const [oneCharacterWidth, height] =
+            this._inputWindowSizeForOneCharacter;
+        const width = (this._maxLength + delimitersLength) * oneCharacterWidth;
+
+        this._inputWindow.setSize([width, height]);
+    }
+
     stop() {
-        this._clearInput();
+        this.clearInput();
+        this._maxLength = null;
         this._inputWindow.setAutoDraw(false);
         this._isInitilized = false;
     }
 
     _getCurrentInput() {
-        return this._inputWindow.text;
+        return this._inputWindow.text.split(this._symbolsDelimiter).join("");
     }
 
     _setCurrentInput(text) {
-        this._inputWindow.text = text.toLowerCase();
-    }
-
-    _clearInput() {
-        this._inputWindow.setText();
-        this._currentLength = 0;
-        this._maxLength = null;
+        this._inputWindow.text = text
+            .split("")
+            .join(this._symbolsDelimiter)
+            .toLowerCase();
     }
 
     clearInput() {
-        this._inputWindow.setText();
+        this._setCurrentInput("");
         this._currentLength = 0;
     }
 
-    _getLastCharacter(text) {
-        return text.slice(text.length - 1);
-    }
-
     _removeLastCharacter(text) {
-        return text.slice(0, -1);
+        this._setCurrentInput(text.slice(0, -1));
     }
 
     _formatDataInput() {
@@ -569,51 +607,51 @@ class WordInputProcessor extends UserInputProcessor {
         this._setCurrentInput(formattedInput);
     }
 
-    _isProhibitedCharacter(character) {
-        return !character.match(/[а-яА-я]/g);
-    }
-
-    _removeProhibitedCharacters() {
-        const currentAnswer = this._getCurrentInput();
+    _removeProhibitedCharacters(currentAnswer) {
         const inputLength = currentAnswer.length;
 
-        if (this._currentLength === inputLength) {
-            return;
-        }
-
         if (inputLength > this._maxLength) {
-            this._setCurrentInput(this._removeLastCharacter(currentAnswer));
+            this._removeLastCharacter(currentAnswer);
             return;
         }
 
-        this._currentLength = inputLength;
-        const lastCharacter = this._getLastCharacter(currentAnswer);
+        const allowedAnswerSymbols = currentAnswer.match(this._allowedSymbols);
 
-        if (!this._isProhibitedCharacter(lastCharacter)) {
-            this._setCurrentInput(currentAnswer);
-        } else {
-            this._setCurrentInput(this._removeLastCharacter(currentAnswer));
+        if (allowedAnswerSymbols === null) {
+            this._setCurrentInput("");
+            return;
         }
+
+        this._setCurrentInput(allowedAnswerSymbols.join(""));
+    }
+
+    _isInputReadyToSend(currentAnswer) {
+        const correctLength = currentAnswer.length - 1 === this._maxLength;
+        const isUserWantsToSend = currentAnswer.includes("\n");
+
+        return correctLength && isUserWantsToSend;
     }
 
     isSendInput() {
         const currentAnswer = this._getCurrentInput();
-        if (
-            currentAnswer.length - 1 === this._maxLength &&
-            currentAnswer.includes("\n")
-        ) {
+        if (this._isInputReadyToSend(currentAnswer)) {
             return true;
         }
 
-        this._removeProhibitedCharacters();
+        this._removeProhibitedCharacters(currentAnswer);
         return false;
     }
 
     getData() {
         this._formatDataInput();
+        const answer = this._getCurrentInput()
+            .split("")
+            .join(this._symbolsDelimiter);
+
         const inputData = {
-            participantAnswer: this._getCurrentInput(),
+            participantAnswer: answer,
         };
+
         return this._additionalTrialData.addData(inputData);
     }
 }
@@ -958,7 +996,7 @@ export {
     Instruction,
     SingleSymbolKeyboard,
     SolutionAttemptsKeeper,
-    WordInputProcessor,
+    TextInputProcessor,
     SingleClickMouse,
     SliderInput,
     ScreenHeightRescaler,
