@@ -312,16 +312,14 @@ function developerMessage(snapshot) {
         win: psychoJS.window,
         color: new util.Color("black"),
         height: 0.05,
-        text: "Код находится в процессе разработки.\nДля переключения между задачами используйте * на клавиатуре с цифрами (там ещё Num Lock клавиша)",
+        text: "Код находится в процессе разработки.\nДля переключения между задачами используйте 'tab'",
         wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
     });
     return function () {
         developerInstruction.draw();
         // Developer's option to look on different tasks
-        if (
-            psychoJS.eventManager.getKeys({ keyList: ["num_multiply"] })
-                .length > 0
-        ) {
+
+        if (psychoJS.eventManager.getKeys({ keyList: ["tab"] }).length > 0) {
             developerInstruction.setAutoDraw(false);
             return Scheduler.Event.NEXT;
         }
