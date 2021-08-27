@@ -488,13 +488,14 @@ class TextInputProcessor extends UserInputProcessor {
         psychoJS,
         additionalTrialData,
         screenSizeAdapter,
+        sizeForOneCharacter,
         symbolsDelimiter,
         allowedSymbolsType,
     }) {
         super({ inputType: "WordInputProcessor", additionalTrialData });
 
         this._inputWindowSizeForOneCharacter =
-            screenSizeAdapter.rescaleElementSize([0.04, 0.2]);
+            screenSizeAdapter.rescaleElementSize(sizeForOneCharacter);
         this._inputWindow = new visual.TextBox({
             win: psychoJS.window,
             name: "textbox",
@@ -531,7 +532,7 @@ class TextInputProcessor extends UserInputProcessor {
     }
 
     _generateRegExp(allowedSymbolsType) {
-        const symbolsTypes = { digits: "\\d", "russian letters": "[а-я]" };
+        const symbolsTypes = { digits: "\\d", "russian letters": "[а-яА-Я]" };
         const regExp = symbolsTypes[allowedSymbolsType];
 
         if (regExp === undefined) {

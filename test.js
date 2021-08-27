@@ -205,6 +205,7 @@ function experimentInit() {
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
         screenSizeAdapter: screenHeightRescaler,
+        sizeForOneCharacter: [0.07, 0.2],
         symbolsDelimiter: "",
         allowedSymbolsType: "russian letters",
     });
@@ -213,6 +214,7 @@ function experimentInit() {
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
         screenSizeAdapter: screenHeightRescaler,
+        sizeForOneCharacter: [0.04, 0.2],
         symbolsDelimiter: " ",
         allowedSymbolsType: "digits",
     });
@@ -294,7 +296,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        // showOnly: "digit span",
+        // showOnly: "anagrams",
         showOnly: null,
         showInstructions: true,
     });
