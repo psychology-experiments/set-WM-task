@@ -58,6 +58,7 @@ psychoJS.scheduleCondition(
 // flowScheduler gets run if the participants presses OK
 flowScheduler.add(updateInfo); // add timeStamp
 flowScheduler.add(experimentInit);
+flowScheduler.add(checkDeviceIsPermittedTOuse);
 
 // quit if user presses Cancel in dialog box:
 dialogCancelScheduler.add(quitPsychoJS, "", false);
@@ -102,6 +103,19 @@ function updateInfo() {
     // add info from the URL:
     util.addInfoFromUrl(expInfo);
 
+    return Scheduler.Event.NEXT;
+}
+
+function checkDeviceIsPermittedTOuse() {
+    const regExpRestrictedDevices =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+
+    if (regExpRestrictedDevices.test(navigator.userAgent)) {
+        const exitMessage = `К сожалению для прохождения исследования нужна клавиатура. 
+        К тому же с мобильного устройства сложнее рассмотреть все визуальные элементы.
+        Запустите исследование с браузера компьютера, пожалуйста.`;
+        quitPsychoJS(exitMessage, false);
+    }
     return Scheduler.Event.NEXT;
 }
 
