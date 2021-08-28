@@ -971,8 +971,14 @@ class AdditionalTrialData {
 
 class ScreenHeightRescaler {
     constructor(windowSize) {
-        this._height = 1;
-        this._width = windowSize[0] / windowSize[1];
+        const [width, height] = windowSize;
+        if (width >= height) {
+            this._height = 1;
+            this._width = width / height;
+        } else {
+            this._height = width / height;
+            this._width = 1;
+        }
     }
 
     rescaleElementSize([originalWidth, originalHeight]) {
