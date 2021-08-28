@@ -2,11 +2,11 @@ import { util, visual } from "../lib/psychojs-2021.2.2.js";
 
 import { TaskPresenter, TaskView, Instruction } from "./general.js";
 
-const instruction = ``;
+const instructionPathName = "LuchinsPractise";
 
 class LuchinsPresenter extends TaskPresenter {
     constructor({ window, screenSizeAdapter, startTime }) {
-        const instructions = [new Instruction(instruction)];
+        const instructions = [new Instruction(null, instructionPathName)];
         const view = new LuchinsView({ window, screenSizeAdapter, startTime });
         super({ name: "Luchins", instructionsText: instructions, view: view });
 

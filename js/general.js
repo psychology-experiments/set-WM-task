@@ -643,8 +643,12 @@ class TextInputProcessor extends UserInputProcessor {
 }
 
 class Instruction {
-    constructor(text) {
-        this.text = text.trim().replace(/\n/g, " ");
+    constructor(text, imagePath) {
+        if (text) {
+            this.text = text.trim().replace(/\n/g, " ");
+        } else {
+            this.image = imagePath;
+        }
     }
 
     toString() {
@@ -652,10 +656,56 @@ class Instruction {
     }
 }
 
+class InstructionPresenter {
+    constructor({ window, Statuses, screenSizeAdapter }) {
+        this._statuses = {
+            inProcess: Statuses.STARTED,
+            awaitsStart: Statuses.NOT_STARTED,
+        };
+
+        this.status = this._statuses.awaitsStart;
+        this._text = new visual.TextStim({
+            win: window,
+            height: screenSizeAdapter.rescaleTextSize(0.05),
+            wrapWidth: screenSizeAdapter.rescaleWrapWidth(0.9),
+            color: new util.Color("black"),
+        });
+
+        this._image = new visual.ImageStim({
+            win: window,
+            size: screenSizeAdapter.rescaleElementSize([1, 1]),
+        });
+
+        this._instruction = null;
+    }
+
+    setInstruction(instructionInfo) {
+        if (instructionInfo.text) {
+            this._text.text = instructionInfo.text;
+            this._instruction = this._text;
+        } else {
+            this._image.setImage(instructionInfo.image);
+            this._instruction = this._image;
+        }
+
+        this.status = this._statuses.inProcess;
+        this.setAutoDraw(true);
+    }
+
+    stop() {
+        this.status = this._statuses.awaitsStart;
+        this.setAutoDraw(false);
+    }
+
+    setAutoDraw(toShow) {
+        this._instruction.setAutoDraw(toShow);
+    }
+}
+
 class InstructionGenerator {
-    constructor({ showInstruction, instructionRoutine, instructionsText }) {
+    constructor({ showInstruction, instructionRoutine, instructionsInfo }) {
         this._showInstruction = showInstruction;
-        this._instructionsText = instructionsText;
+        this._instructionsInfo = instructionsInfo;
         this._instructionRoutine = instructionRoutine;
 
         this._instructionsIdx = 0;
@@ -666,17 +716,19 @@ class InstructionGenerator {
             return;
         }
 
-        if (this._instructionsIdx >= this._instructionsText.length) {
+        if (this._instructionsIdx >= this._instructionsInfo.length) {
             throw new Error(
                 "Asked to generate more instructions than task have."
             );
         }
 
         const instructionRoutine = this._instructionRoutine(
-            this._instructionsText[this._instructionsIdx],
+            this._instructionsInfo[this._instructionsIdx],
             task
         );
+
         this._instructionsIdx += 1;
+
         return instructionRoutine;
     }
 }
@@ -737,12 +789,14 @@ class ExperimentOrganizer {
 
         this._psychoJS.experiment.addLoop(trials); // add the loop to the experiment
 
-        // adds instructions to tasks
+        // adds instructions to task's part
+
         loopScheduler.add(
             instructionGenerator.generateInstructionRoutine(
                 routineSettings.task
             )
         );
+
         for (const thisTrial of trials) {
             const snapshot = trials.getSnapshot();
             for (const routine of taskRoutines.routines) {
@@ -767,7 +821,7 @@ class ExperimentOrganizer {
             showInstruction: this._showInstructions,
             when: routineSettings.nLoops,
             instructionRoutine: this._routines.instruction,
-            instructionsText: routineSettings.task.instructions,
+            instructionsInfo: routineSettings.task.instructions,
         });
 
         for (let nLoops of routineSettings.nLoops) {
@@ -980,6 +1034,7 @@ export {
     ExperimentOrganizer,
     DataSaver,
     Instruction,
+    InstructionPresenter,
     SingleSymbolKeyboard,
     SolutionAttemptsKeeper,
     TextInputProcessor,

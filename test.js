@@ -66,7 +66,17 @@ psychoJS.start({
     expName: expName,
     expInfo: expInfo,
     resources: [
-        // { 'name': 'materials/Stroop/BB.png', 'path': 'materials/Stroop/BB.png' }
+        { name: "LuchinsPractise", path: "materials/Luchins/practice.png" },
+        { name: "Luchins1", path: "materials/Luchins/1.jpg" },
+        { name: "Luchins2", path: "materials/Luchins/2.jpg" },
+        { name: "Luchins3", path: "materials/Luchins/3.jpg" },
+        { name: "Luchins4", path: "materials/Luchins/4.jpg" },
+        { name: "Luchins5", path: "materials/Luchins/5.jpg" },
+        { name: "Luchins6", path: "materials/Luchins/6.jpg" },
+        { name: "Luchins7", path: "materials/Luchins/7.jpg" },
+        { name: "Luchins8", path: "materials/Luchins/8.jpg" },
+        { name: "Luchins9", path: "materials/Luchins/9.jpg" },
+        { name: "Luchins10", path: "materials/Luchins/10.jpg" },
     ],
 });
 
@@ -174,13 +184,11 @@ function experimentInit() {
         maskTime: 100, // In ms
     });
 
-    instructionPresenter = new visual.TextStim({
-        win: psychoJS.window,
-        height: screenHeightRescaler.rescaleTextSize(0.05),
-        wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.9),
-        color: new util.Color("black"),
+    instructionPresenter = new general.InstructionPresenter({
+        window: psychoJS.window,
+        Statuses: PsychoJS.Status,
+        screenSizeAdapter: screenHeightRescaler,
     });
-    instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
 
     // Create some handy timers
     globalClock = new util.Clock(); // to track the time since experiment started
@@ -338,25 +346,22 @@ function developerMessage(snapshot) {
     };
 }
 
-function instructionRoutine(instructionText, task) {
+function instructionRoutine(instructionInfo, task) {
     return function () {
         if (task.isToSkipInstruction()) {
             return Scheduler.Event.NEXT;
         }
 
         if (instructionPresenter.status === PsychoJS.Status.NOT_STARTED) {
-            instructionPresenter.text = instructionText;
-            instructionPresenter.status = PsychoJS.Status.STARTED;
+            instructionPresenter.setInstruction(instructionInfo);
             psychoJS.eventManager.clearEvents();
-            instructionPresenter.draw();
         }
 
         if (
             instructionPresenter.status === PsychoJS.Status.STARTED &&
             psychoJS.eventManager.getKeys({ keyList: ["right"] }).length > 0
         ) {
-            instructionPresenter.setAutoDraw(false);
-            instructionPresenter.status = PsychoJS.Status.NOT_STARTED;
+            instructionPresenter.stop();
             psychoJS.eventManager.clearEvents();
             return Scheduler.Event.NEXT;
         }
