@@ -108,6 +108,7 @@ var routineClock;
 var keyboard;
 var wordInputProcessor;
 var digitInputProcessor;
+var luchinsExpressionsInputProcessor;
 var sliderInput;
 var singleClickMouse;
 var screenHeightRescaler;
@@ -207,7 +208,7 @@ function experimentInit() {
         screenSizeAdapter: screenHeightRescaler,
         sizeForOneCharacter: [0.07, 0.2],
         symbolsDelimiter: "",
-        allowedSymbolsType: "russian letters",
+        allowedSymbolsRegExp: "[а-яА-Я]",
     });
 
     digitInputProcessor = new general.TextInputProcessor({
@@ -216,7 +217,16 @@ function experimentInit() {
         screenSizeAdapter: screenHeightRescaler,
         sizeForOneCharacter: [0.04, 0.2],
         symbolsDelimiter: " ",
-        allowedSymbolsType: "digits",
+        allowedSymbolsRegExp: "\\d",
+    });
+
+    luchinsExpressionsInputProcessor = new general.TextInputProcessor({
+        psychoJS: psychoJS,
+        additionalTrialData: additionalDataHandler,
+        screenSizeAdapter: screenHeightRescaler,
+        sizeForOneCharacter: [0.04, 0.2],
+        symbolsDelimiter: "",
+        allowedSymbolsRegExp: "[\\d+-]",
     });
 
     sliderInput = new general.SliderInput({
@@ -243,12 +253,12 @@ function experimentInit() {
             isForExperiment: true,
             nLoops: [60, 60],
         },
-        // luchins: {
-        //     task: luchins,
-        //     userInputProcessor: null,
-        //     isForExperiment: true,
-        //     nLoops: [0],
-        // },
+        luchins: {
+            task: luchins,
+            userInputProcessor: luchinsExpressionsInputProcessor,
+            isForExperiment: true,
+            nLoops: [10],
+        },
         "dembo-rubinstein": {
             task: demboRubinstein,
             userInputProcessor: sliderInput,
@@ -296,8 +306,8 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        // showOnly: "anagrams",
-        showOnly: null,
+        showOnly: "luchins",
+        // showOnly: null,
         showInstructions: true,
     });
 
