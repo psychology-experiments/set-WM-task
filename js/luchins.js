@@ -53,19 +53,15 @@ class LuchinsView extends TaskView {
     constructor({ window, screenSizeAdapter, startTime }) {
         super({ startTime });
 
-        this._task = new visual.TextStim({
+        this._image = new visual.ImageStim({
             win: window,
-            text: "",
-            color: "black",
             pos: screenSizeAdapter.rescalePosition([0, 0.2]),
-            height: screenSizeAdapter.rescaleTextSize(0.15),
-            autoDraw: false,
-            bold: true,
+            size: screenSizeAdapter.rescaleElementSize([1, 1]),
         });
     }
 
-    setLuchinsTask(task) {
-        this._task.text = task;
+    setLuchinsTask(taskFP) {
+        this._task.setImage(taskFP);
     }
 
     setAutoDraw(toShow) {
