@@ -490,7 +490,7 @@ class TextInputProcessor extends UserInputProcessor {
         screenSizeAdapter,
         sizeForOneCharacter,
         symbolsDelimiter,
-        allowedSymbolsType,
+        allowedSymbolsRegExp,
     }) {
         super({ inputType: "WordInputProcessor", additionalTrialData });
 
@@ -528,22 +528,7 @@ class TextInputProcessor extends UserInputProcessor {
         this._maxLength = null;
 
         this._symbolsDelimiter = symbolsDelimiter;
-        this._allowedSymbols = this._generateRegExp(allowedSymbolsType);
-    }
-
-    _generateRegExp(allowedSymbolsType) {
-        const symbolsTypes = { digits: "\\d", "russian letters": "[а-яА-Я]" };
-        const regExp = symbolsTypes[allowedSymbolsType];
-
-        if (regExp === undefined) {
-            throw new Error(
-                `${allowedSymbolsType} is not supported. Use one of these [${Object.keys(
-                    symbolsTypes
-                ).join(", ")}]`
-            );
-        }
-
-        return new RegExp(regExp, "g");
+        this._allowedSymbols = new RegExp(allowedSymbolsRegExp, "g");
     }
 
     initilize(taskConditions) {
