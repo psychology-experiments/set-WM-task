@@ -67,7 +67,10 @@ psychoJS.start({
     expName: expName,
     expInfo: expInfo,
     resources: [
-        { name: "LuchinsPractise", path: "materials/Luchins/practice.png" },
+        {
+            name: "LuchinsInstruction",
+            path: "materials/Luchins/instruction.png",
+        },
         { name: "Luchins1", path: "materials/Luchins/1.jpg" },
         { name: "Luchins2", path: "materials/Luchins/2.jpg" },
         { name: "Luchins3", path: "materials/Luchins/3.jpg" },

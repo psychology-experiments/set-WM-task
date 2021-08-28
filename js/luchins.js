@@ -2,7 +2,7 @@ import { util, visual } from "../lib/psychojs-2021.2.2.js";
 
 import { TaskPresenter, TaskView, Instruction } from "./general.js";
 
-const instructionPathName = "LuchinsPractise";
+const instructionPathName = "LuchinsInstruction";
 
 class LuchinsPresenter extends TaskPresenter {
     constructor({ window, screenSizeAdapter, startTime }) {
