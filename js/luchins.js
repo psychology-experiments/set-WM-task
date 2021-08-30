@@ -10,42 +10,78 @@ class LuchinsPresenter extends TaskPresenter {
         const view = new LuchinsView({ window, screenSizeAdapter, startTime });
         super({ name: "Luchins", instructionsText: instructions, view: view });
 
-        this._task = null;
-        this._tasks = [];
+        this._taskIdx = 0;
+        this._taskPossibleSolutions = null;
+        this._taskNumber = `Luchins${this._taskIdx + 1}`;
+        this._tasksSolutions = [
+            ["37-21-3-3", "37-3-21-3", "37-3-3-21"],
+            ["37-24-2-2", "37-2-24-2", "37-2-2-24"],
+            ["39-22-2-2", "39-2-22-2", "39-2-2-22"],
+            ["38-25-2-2", "38-2-25-2", "38-2-2-25"],
+            ["29-14-2-2", "29-2-14-2", "29-2-2-14"],
+            ["27-12-3-3", "27-3-12-3", "27-3-3-12", "12-3"],
+            ["30-12-3", "30-3-12", "12+3", "3+12"],
+            [
+                "28-12-2-2-2",
+                "28-2-12-2-2",
+                "28-2-2-12-2",
+                "28-2-2-2-12",
+                "12-2",
+            ],
+            ["12-5"],
+            ["30-13-4-4", "30-4-13-4", "30-4-4-13", "13-4"],
+        ];
     }
 
     getTaskConditions() {
-        throw new Error(
-            `Method 'getTaskConditions()' must be implemented in ${this.name} class.`
-        );
+        const conditions = {
+            maxInputLength: 20,
+            isExactLength: false,
+        };
+        return conditions;
     }
 
     nextStimulus() {
-        throw new Error(
-            `Method 'nextStimulus()' must be implemented in ${this.name} class.`
+        this._taskPossibleSolutions = this._tasksSolutions[this._taskIdx];
+        this._view.setLuchinsTask(this._taskNumber);
+        this._taskIdx += 1;
+        this._taskNumber = `Luchins${this._taskIdx + 1}`;
+        this._trialFinished = false;
+    }
+
+    _checkAnswer(participantAnswer) {
+        return this._taskPossibleSolutions.some(
+            (solution) => solution === participantAnswer
         );
     }
 
     checkInput(userInputProcessor) {
-        throw new Error(
-            `Method 'checkInput(userInputProcessor)' must be implemented in ${this.name} class.`
-        );
-    }
+        const inputData = userInputProcessor.getData();
+        const participantAnswer = inputData.participantAnswer;
+        const isCorrectAnswer = this._checkAnswer(participantAnswer);
 
-    isToSkipInstruction() {
-        return false;
+        let attemptData = {
+            task: this.name,
+            taskNumber: this._taskNumber,
+            rightAnswer: this._taskPossibleSolutions.join(" или "),
+            participantAnswer: participantAnswer,
+            isCorrect: isCorrectAnswer ? 1 : 0,
+            solved: isCorrectAnswer ? 1 : 0,
+        };
+
+        attemptData = Object.assign(attemptData, inputData);
+
+        this._solutionAttemptsKeeper.saveAttempt(attemptData);
+        userInputProcessor.clearInput();
+        this._trialFinished = isCorrectAnswer;
     }
 
     isTrialFinished() {
-        throw new Error(
-            `Method 'isTrialFinished()' must be implemented in ${this.name} class.`
-        );
+        return this._trialFinished;
     }
 
     isTaskFinished() {
-        throw new Error(
-            `Method 'isTaskFinished()' must be implemented in ${this.name} class.`
-        );
+        return this._taskIdx === 10;
     }
 }
 
@@ -53,15 +89,15 @@ class LuchinsView extends TaskView {
     constructor({ window, screenSizeAdapter, startTime }) {
         super({ startTime });
 
-        this._image = new visual.ImageStim({
+        this._task = new visual.ImageStim({
             win: window,
-            pos: screenSizeAdapter.rescalePosition([0, 0.2]),
-            size: screenSizeAdapter.rescaleElementSize([1, 1]),
+            pos: screenSizeAdapter.rescalePosition([0, 0.3]),
+            size: screenSizeAdapter.rescaleElementSize([0.7, 0.7]),
         });
     }
 
-    setLuchinsTask(taskFP) {
-        this._task.setImage(taskFP);
+    setLuchinsTask(taskName) {
+        this._task.setImage(taskName);
     }
 
     setAutoDraw(toShow) {
