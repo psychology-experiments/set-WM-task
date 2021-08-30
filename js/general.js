@@ -526,6 +526,7 @@ class TextInputProcessor extends UserInputProcessor {
 
         this._currentLength = 0;
         this._maxLength = null;
+        this._acceptLengthLesserThanMax = false;
 
         this._symbolsDelimiter = symbolsDelimiter;
         this._allowedSymbols = new RegExp(allowedSymbolsRegExp, "g");
@@ -545,6 +546,8 @@ class TextInputProcessor extends UserInputProcessor {
         );
 
         this._maxLength = taskConditions.maxInputLength;
+        this._acceptLengthLesserThanMax =
+            taskConditions.isExactLength === undefined ? false : true;
         this._fitInputWindow();
         this._isInitilized = true;
         this._inputWindow.refresh();
@@ -564,6 +567,7 @@ class TextInputProcessor extends UserInputProcessor {
     stop() {
         this.clearInput();
         this._maxLength = null;
+        this._acceptLengthLesserThanMax = false;
         this._inputWindow.setAutoDraw(false);
         this._isInitilized = false;
     }
@@ -612,7 +616,9 @@ class TextInputProcessor extends UserInputProcessor {
     }
 
     _isInputReadyToSend(currentAnswer) {
-        const correctLength = currentAnswer.length - 1 === this._maxLength;
+        const correctLength =
+            currentAnswer.length - 1 === this._maxLength ||
+            this._acceptLengthLesserThanMax;
         const isUserWantsToSend = currentAnswer.includes("\n");
 
         return correctLength && isUserWantsToSend;
