@@ -676,7 +676,7 @@ class FeedbackMessageDispatcher {
         }
 
         this._allPositions = availiablePositions;
-        this._currentMessages = [];
+        this._currentMessages = {};
     }
 
     _stopMessageDrawing(messageView) {
@@ -684,7 +684,7 @@ class FeedbackMessageDispatcher {
         this._allPositions.unshift(messageView.pos);
     }
 
-    _showMessage(messageView) {
+    _showMessage(messageName, messageView) {
         if (this._allPositions.length === 0) {
             return;
         }
@@ -698,26 +698,24 @@ class FeedbackMessageDispatcher {
             () => this._stopMessageDrawing(messageView),
             messageView.showTime
         );
-        this._currentMessages.push(timeouID);
+        this._currentMessages[messageName] = timeouID;
     }
 
     showMessage(messageName) {
         const messageView = this._messagesViews[messageName];
-        this._showMessage(messageView);
+        this._showMessage(messageName, messageView);
     }
 
     stopAllMessages() {
-        for (let timeoutID of this._currentMessages) {
-            clearTimeout(timeoutID);
-        }
-
         for (let messageName in this._messagesViews) {
-            this._stopMessage(messageName);
+            this.stopMessage(messageName);
         }
     }
 
-    _stopMessage(messageName) {
+    stopMessage(messageName) {
         const messageView = this._messagesViews[messageName];
+        clearTimeout(this._currentMessages[messageName]);
+        delete this._currentMessages[messageName];
         this._stopMessageDrawing(messageView);
     }
 }
