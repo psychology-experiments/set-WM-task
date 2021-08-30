@@ -648,6 +648,80 @@ class TextInputProcessor extends UserInputProcessor {
     }
 }
 
+class FeedbackMessage {
+    constructor({ name, messageText, textColor, showTime }) {
+        this.name = name;
+        this.messageText = messageText;
+        this.textColor = textColor;
+        this.showTime = showTime;
+    }
+}
+
+class FeedbackMessageDispatcher {
+    constructor({ window, textHeight, messages, availiablePositions }) {
+        this._messages = messages;
+        this._messagesViews = {};
+        for (let message of messages) {
+            const view = new visual.TextStim({
+                win: window,
+                text: message.messageText,
+                color: new util.Color(message.textColor),
+                pos: [0, 0],
+                height: textHeight,
+                autoDraw: false,
+                bold: true,
+            });
+            view.showTime = message.showTime;
+            this._messagesViews[message.name] = view;
+        }
+
+        this._allPositions = availiablePositions;
+        this._currentMessages = [];
+    }
+
+    _stopMessageDrawing(messageView) {
+        messageView.setAutoDraw(false);
+        this._allPositions.unshift(messageView.pos);
+    }
+
+    _showMessage(messageView) {
+        if (this._allPositions.length === 0) {
+            return;
+        }
+
+        messageView.setAutoDraw(true);
+
+        const chosenPosition = this._allPositions.shift();
+        messageView.pos = chosenPosition;
+
+        const timeouID = setTimeout(
+            () => this._stopMessageDrawing(messageView),
+            messageView.showTime
+        );
+        this._currentMessages.push(timeouID);
+    }
+
+    showMessage(messageName) {
+        const messageView = this._messagesViews[messageName];
+        this._showMessage(messageView);
+    }
+
+    stopAllMessages() {
+        for (let timeoutID of this._currentMessages) {
+            clearTimeout(timeoutID);
+        }
+
+        for (let messageName in this._messagesViews) {
+            this._stopMessage(messageName);
+        }
+    }
+
+    _stopMessage(messageName) {
+        const messageView = this._messagesViews[messageName];
+        this._stopMessageDrawing(messageView);
+    }
+}
+
 class Instruction {
     constructor(text, imagePath) {
         if (text) {
@@ -1044,6 +1118,8 @@ function cumsum(array) {
 export {
     AdditionalTrialData,
     ExperimentOrganizer,
+    FeedbackMessage,
+    FeedbackMessageDispatcher,
     DataSaver,
     Instruction,
     InstructionPresenter,
