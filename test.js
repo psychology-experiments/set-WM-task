@@ -186,6 +186,7 @@ function experimentInit() {
     luchins = new Luchins({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
+        startTime: 0.3,
     });
 
     demboRubinstein = new DemboRubinstein({
