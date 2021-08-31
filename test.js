@@ -76,6 +76,10 @@ psychoJS.start({
     expInfo: expInfo,
     resources: [
         {
+            name: "stroopHint",
+            path: "materials/StroopTest/InstructionHint.png",
+        },
+        {
             name: "LuchinsInstruction",
             path: "materials/Luchins/instruction.png",
         },
@@ -347,7 +351,7 @@ function experimentInit() {
             "black and red schulte",
         ],
         isInDevelopment: true,
-        // showOnly: "luchins",
+        // showOnly: "stroop",
         showOnly: null,
         showInstructions: true,
     });

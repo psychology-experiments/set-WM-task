@@ -231,26 +231,12 @@ class StroopTestView extends TaskView {
         this._currentStimulus = null;
         this._words = {};
 
-        const hintLetterSize = screenSizeAdapter.rescaleTextSize(0.1);
-
-        this._stroopHint = new visual.TextStim({
+        this._stroopHint = new visual.ImageStim({
             win: window,
-            text: this._generateHintText(),
-            color: "black",
-            units: "norm",
-            height: hintLetterSize,
-            pos: [0, 0.6 - hintLetterSize],
-            autoDraw: false,
-            bold: true,
-            wrapWidth: screenSizeAdapter.rescaleWrapWidth(0.8),
+            image: "stroopHint",
+            pos: screenSizeAdapter.rescalePosition([0, 0.3]),
+            size: screenSizeAdapter.rescaleElementSize([0.18, 0.1]),
         });
-    }
-
-    _generateHintText() {
-        // const colors = ["красный", "жёлтый", "зелёный", "синий"];
-        const spaceSeparator = "\t".repeat(13);
-        const hintText = `красный жёлтый зелёный синий\n1${spaceSeparator}2${spaceSeparator}3${spaceSeparator}4`;
-        return hintText;
     }
 
     createStimuli({ window, screenSizeAdapter, stimuliInfo }) {
