@@ -1076,7 +1076,7 @@ class ScreenHeightRescaler {
     }
 
     rescaleWrapWidth(originalWrapWidth) {
-        return originalWrapWidth * this._width;
+        return (originalWrapWidth - 0.2) * this._width;
     }
 }
 

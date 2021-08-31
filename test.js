@@ -38,14 +38,22 @@ psychoJS.window.adjustScreenSize();
 // Start code blocks for 'Before Experiment'
 // schedule the experiment:
 
-// psychoJS.schedule(psychoJS.gui.DlgFromDict({
-//   dictionary: expInfo,
-//   title: expName
-// }));
+psychoJS.schedule(
+    psychoJS.gui.DlgFromDict({
+        dictionary: expInfo,
+        title: expName,
+    })
+);
 
 const flowScheduler = new Scheduler(psychoJS);
 const dialogCancelScheduler = new Scheduler(psychoJS);
-// psychoJS.scheduleCondition(function () { return (psychoJS.gui.dialogComponent.button === 'OK'); }, flowScheduler, dialogCancelScheduler);
+psychoJS.scheduleCondition(
+    function () {
+        return psychoJS.gui.dialogComponent.button === "OK";
+    },
+    flowScheduler,
+    dialogCancelScheduler
+);
 
 psychoJS.scheduleCondition(
     function () {
