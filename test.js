@@ -133,6 +133,7 @@ var instructionPresenter;
 var globalClock;
 var routineClock;
 var keyboard;
+var keyboardTaskSkipper;
 var wordInputProcessor;
 var digitInputProcessor;
 var luchinsExpressionsInputProcessor;
@@ -226,6 +227,12 @@ function experimentInit() {
     keyboard = new general.SingleSymbolKeyboard({
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
+    });
+
+    keyboardTaskSkipper = new core.Keyboard({
+        psychoJS: psychoJS,
+        clock: new util.Clock(),
+        waitForStart: true,
     });
 
     wordInputProcessor = new general.TextInputProcessor({
@@ -348,15 +355,30 @@ function developerMessage(snapshot) {
         win: psychoJS.window,
         color: new util.Color("black"),
         height: 0.05,
-        text: "Код находится в процессе разработки.\nДля переключения между задачами используйте 'tab'",
+        text: `Код находится в процессе разработки.\nДля переключения между задачами используйте 'ctrl', 
+        который находится в левом нижнем углу клавиатуры`,
         wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
     });
+    developerInstruction.status = PsychoJS.Status.NOT_STARTED;
     return function () {
-        developerInstruction.draw();
-        // Developer's option to look on different tasks
+        if (developerInstruction.status === PsychoJS.Status.NOT_STARTED) {
+            developerInstruction.status = PsychoJS.Status.STARTED;
+            developerInstruction.setAutoDraw(true);
+            keyboardTaskSkipper.start();
+            keyboardTaskSkipper.clearEvents();
+        }
 
-        if (psychoJS.eventManager.getKeys({ keyList: ["tab"] }).length > 0) {
+        // Developer's option to look on different tasks
+        if (
+            developerInstruction.status === PsychoJS.Status.STARTED &&
+            keyboardTaskSkipper.getKeys({
+                keyList: ["lcontrol"],
+                waitRelease: false,
+            }).length > 0
+        ) {
             developerInstruction.setAutoDraw(false);
+            keyboardTaskSkipper.stop();
+            keyboardTaskSkipper.clearEvents();
             return Scheduler.Event.NEXT;
         }
 
@@ -372,15 +394,20 @@ function instructionRoutine(instructionInfo, task) {
 
         if (instructionPresenter.status === PsychoJS.Status.NOT_STARTED) {
             instructionPresenter.setInstruction(instructionInfo);
-            psychoJS.eventManager.clearEvents();
+            keyboardTaskSkipper.start();
+            keyboardTaskSkipper.clearEvents();
         }
 
         if (
             instructionPresenter.status === PsychoJS.Status.STARTED &&
-            psychoJS.eventManager.getKeys({ keyList: ["right"] }).length > 0
+            keyboardTaskSkipper.getKeys({
+                keyList: ["right"],
+                waitRelease: false,
+            }).length > 0
         ) {
             instructionPresenter.stop();
-            psychoJS.eventManager.clearEvents();
+            keyboardTaskSkipper.stop();
+            keyboardTaskSkipper.clearEvents();
             return Scheduler.Event.NEXT;
         }
 
@@ -391,6 +418,11 @@ function instructionRoutine(instructionInfo, task) {
 function taskRoutineBegin(snapshot, task, userInputProcessor) {
     return function () {
         console.count("begin");
+
+        if (experimentSequence.isInDevelopment) {
+            keyboardTaskSkipper.start();
+            keyboardTaskSkipper.clearEvents();
+        }
 
         task.nextStimulus();
         routineClock.reset();
@@ -439,9 +471,13 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
         // Developer's option to look on different tasks
         if (
             experimentSequence.isInDevelopment &&
-            psychoJS.eventManager.getKeys({ keyList: ["num_multiply"] })
-                .length > 0
+            keyboardTaskSkipper.getKeys({
+                keyList: ["lcontrol"],
+                waitRelease: false,
+            }).length > 0
         ) {
+            keyboardTaskSkipper.stop();
+            keyboardTaskSkipper.clearEvents();
             snapshot.finished = true;
             task.skipTask();
             return Scheduler.Event.NEXT;
