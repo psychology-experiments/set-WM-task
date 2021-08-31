@@ -751,7 +751,7 @@ class InstructionPresenter {
 
         this._image = new visual.ImageStim({
             win: window,
-            size: screenSizeAdapter.rescaleElementSize([1, 1]),
+            size: screenSizeAdapter.rescaleElementSize([0.8, 0.8]),
         });
 
         this._instruction = null;

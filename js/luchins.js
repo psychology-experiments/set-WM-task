@@ -117,7 +117,7 @@ class LuchinsView extends TaskView {
         this._task = new visual.ImageStim({
             win: window,
             pos: screenSizeAdapter.rescalePosition([0, 0.3]),
-            size: screenSizeAdapter.rescaleElementSize([0.7, 0.7]),
+            size: screenSizeAdapter.rescaleElementSize([0.6, 0.6]),
         });
     }
 
