@@ -205,6 +205,8 @@ class ScaleEvaluationPart {
         this._taskView = taskView;
 
         this._trialFinished = false;
+
+        this._skip = this._scales.length === 0;
     }
 
     addScales(scales) {
@@ -212,6 +214,8 @@ class ScaleEvaluationPart {
             this._scales.push(scale);
         }
         this._scales = util.shuffle(Array.from(this._scales));
+
+        this._skip = this._scales.length === 0;
     }
 
     setNextScale() {
@@ -232,6 +236,9 @@ class ScaleEvaluationPart {
     }
 
     getCurrentScale() {
+        if (this._skip) {
+            return null;
+        }
         const description = this._currentScale.scaleDescription;
         const leftEnd = this._currentScale.leftEnd;
         const rightEnd = this._currentScale.rightEnd;
@@ -246,7 +253,7 @@ class ScaleEvaluationPart {
     }
 
     isCheckRating() {
-        return true;
+        return !this._skip;
     }
 
     isToSkipInstruction() {
