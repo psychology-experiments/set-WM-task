@@ -5,6 +5,15 @@ import * as general from "./general.js";
 
 const instructionPathName = "LuchinsInstruction";
 
+const instructionReminderText = `
+Используемое математическое выражение должно быть максимально приближено 
+к реальному решению задачи. Например, если самый большой сосуд вмещает 37 
+литров, то действие "37+17" будет неверно, поскольку столько воды налить некуда. 
+Кроме того, математическое выражение, которое ты записываешь в ответе должно 
+содержать только знаки “+” и “–”. 
+Между цифрами и математическими знаками не нужно ставить “пробел”.
+Для ввода ответа нажми “ENTER”`;
+
 class LuchinsPresenter extends TaskPresenter {
     constructor({ window, screenSizeAdapter, startTime }) {
         const instructions = [new Instruction(null, instructionPathName)];
@@ -38,7 +47,7 @@ class LuchinsPresenter extends TaskPresenter {
                 name: "incorrectAnswer",
                 messageText: "Ответ неверный",
                 textColor: "#ed2939",
-                showTime: 3000,
+                showTime: 2000,
             }),
         ];
         const positionsForFeedback = [[0, -0.3]].map((pos) =>
@@ -116,8 +125,19 @@ class LuchinsView extends TaskView {
 
         this._task = new visual.ImageStim({
             win: window,
-            pos: screenSizeAdapter.rescalePosition([0, 0.3]),
+            pos: screenSizeAdapter.rescalePosition([0, 0.0]),
             size: screenSizeAdapter.rescaleElementSize([0.6, 0.6]),
+        });
+
+        this._instructionReminder = new visual.TextStim({
+            win: window,
+            text: instructionReminderText,
+            color: "black",
+            pos: screenSizeAdapter.rescalePosition([0, 0.3]),
+            height: screenSizeAdapter.rescaleTextSize(0.03),
+            wrapWidth: screenSizeAdapter.rescaleWrapWidth(0.9),
+            autoDraw: false,
+            bold: true,
         });
     }
 
@@ -127,6 +147,7 @@ class LuchinsView extends TaskView {
 
     setAutoDraw(toShow) {
         this._task.setAutoDraw(toShow);
+        this._instructionReminder.setAutoDraw(toShow);
     }
 }
 

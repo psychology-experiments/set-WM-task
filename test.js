@@ -199,7 +199,7 @@ function experimentInit() {
     luchins = new Luchins({
         window: psychoJS.window,
         screenSizeAdapter: screenHeightRescaler,
-        startTime: 0.3,
+        startTime: 0.1,
     });
 
     demboRubinstein = new DemboRubinstein({
@@ -251,6 +251,7 @@ function experimentInit() {
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
         screenSizeAdapter: screenHeightRescaler,
+        position: [0, -0.1],
         sizeForOneCharacter: [0.07, 0.2],
         symbolsDelimiter: "",
         allowedSymbolsRegExp: "[а-яА-Я]",
@@ -260,6 +261,7 @@ function experimentInit() {
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
         screenSizeAdapter: screenHeightRescaler,
+        position: [0, -0.1],
         sizeForOneCharacter: [0.04, 0.2],
         symbolsDelimiter: " ",
         allowedSymbolsRegExp: "\\d",
@@ -269,6 +271,7 @@ function experimentInit() {
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
         screenSizeAdapter: screenHeightRescaler,
+        position: [0, -0.3],
         sizeForOneCharacter: [0.037, 0.2],
         symbolsDelimiter: "",
         allowedSymbolsRegExp: "[\\d+-]",
