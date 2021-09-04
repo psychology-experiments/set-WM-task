@@ -381,7 +381,7 @@ class SingleSymbolKeyboard extends UserInputProcessor {
             rt: this._rt,
         };
 
-        return inputData;
+        return this._additionalTrialData.addData(inputData);
     }
 
     stop() {
