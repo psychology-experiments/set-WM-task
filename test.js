@@ -144,7 +144,7 @@ var digitSpan;
 var instructionPresenter;
 var globalClock;
 var routineClock;
-var keyboard;
+var singleKeyKeyboard;
 var keyboardTaskSkipper;
 var wordInputProcessor;
 var digitInputProcessor;
@@ -236,7 +236,7 @@ function experimentInit() {
         buttonToCheck: "left",
     });
 
-    keyboard = new general.SingleSymbolKeyboard({
+    singleKeyKeyboard = new general.SingleSymbolKeyboard({
         psychoJS: psychoJS,
         additionalTrialData: additionalDataHandler,
     });
@@ -297,7 +297,7 @@ function experimentInit() {
         },
         stroop: {
             task: stroop,
-            userInputProcessor: keyboard,
+            userInputProcessor: singleKeyKeyboard,
             isForExperiment: true,
             nLoops: [60, 60],
         },
