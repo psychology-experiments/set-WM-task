@@ -677,18 +677,16 @@ class FeedbackMessageDispatcher {
         }
 
         this._allPositions = new Set(availiablePositions);
-        console.log("at the start", this._allPositions, availiablePositions);
         this._currentMessages = {};
     }
 
     _stopMessageDrawing(messageView) {
         messageView.setAutoDraw(false);
         this._allPositions.add(messageView.pos);
-        console.log("added");
     }
 
     _showMessage(messageName, messageView) {
-        if (this._allPositions.length === 0) {
+        if (this._allPositions.size === 0) {
             return;
         }
 
@@ -707,11 +705,6 @@ class FeedbackMessageDispatcher {
 
     showMessage(messageName) {
         const messageView = this._messagesViews[messageName];
-
-        if (messageName in this._currentMessages) {
-            this.stopMessage(messageName);
-        }
-
         this._showMessage(messageName, messageView);
     }
 
