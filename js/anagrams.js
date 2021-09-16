@@ -1,6 +1,7 @@
 import { util, visual } from "../lib/psychojs-2021.2.2.js";
 
 import { TaskPresenter, TaskView, Instruction } from "./general.js";
+import * as general from "./general.js";
 
 const instruction = `
 Сейчас тебе будет предложено решить несколько анаграмм. 
@@ -50,6 +51,24 @@ class AnagramsPresenter extends TaskPresenter {
         this._anagrams = this._createAnagrams();
 
         this._countdownSolveClock = new util.CountdownTimer();
+
+        const feedbackMessages = [
+            new general.FeedbackMessage({
+                name: "incorrectAnswer",
+                messageText: "Ответ неверный",
+                textColor: "#ed2939",
+                showTime: 2000,
+            }),
+        ];
+        const positionsForFeedback = [[0, 0.05]].map((pos) =>
+            screenSizeAdapter.rescalePosition(pos)
+        );
+        this._feedbackMessager = new general.FeedbackMessageDispatcher({
+            window: window,
+            textHeight: screenSizeAdapter.rescaleTextSize(0.05),
+            messages: feedbackMessages,
+            availiablePositions: positionsForFeedback,
+        });
     }
 
     _createAnagrams() {
@@ -87,6 +106,12 @@ class AnagramsPresenter extends TaskPresenter {
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
         userInputProcessor.clearInput();
         this._trialFinished = isCorrectAnswer;
+
+        if (!isCorrectAnswer) {
+            this._feedbackMessager.showMessage("incorrectAnswer");
+        } else {
+            this._feedbackMessager.stopAllMessages();
+        }
     }
 
     addUnfinishedTrialData(userInputProcessor) {
@@ -105,6 +130,7 @@ class AnagramsPresenter extends TaskPresenter {
         attemptData = Object.assign(attemptData, inputData);
 
         this._solutionAttemptsKeeper.saveAttempt(attemptData);
+        this._feedbackMessager.stopAllMessages();
     }
 
     start() {
