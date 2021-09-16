@@ -12,7 +12,7 @@ const instructionReminderText = `
 Кроме того, математическое выражение, которое ты записываешь в ответе должно 
 содержать только знаки “+” и “–”. 
 Между цифрами и математическими знаками не нужно ставить “пробел”.
-Для ввода ответа нажми “ENTER”`;
+Для ввода ответа нажми «ENTER»`;
 
 class LuchinsPresenter extends TaskPresenter {
     constructor({ window, screenSizeAdapter, startTime }) {
