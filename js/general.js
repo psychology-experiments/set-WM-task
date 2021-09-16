@@ -535,7 +535,8 @@ class TextInputProcessor extends UserInputProcessor {
         const feedbackMessages = [
             new FeedbackMessage({
                 name: "toManySymbols",
-                messageText: "Достигнуто максимальное количество символов",
+                messageText:
+                    "Достигнуто максимальное количество символов. Чтобы ввести ответ нажмите «ENTER»",
                 textColor: "#ff6700",
                 showTime: 2000,
             }),
@@ -545,7 +546,7 @@ class TextInputProcessor extends UserInputProcessor {
         );
         this._feedbackMessager = new FeedbackMessageDispatcher({
             window: psychoJS.window,
-            textHeight: screenSizeAdapter.rescaleTextSize(0.05),
+            textHeight: screenSizeAdapter.rescaleTextSize(0.03),
             messages: feedbackMessages,
             availiablePositions: positionsForFeedback,
         });
@@ -582,9 +583,7 @@ class TextInputProcessor extends UserInputProcessor {
         this._feedbackCheckerId = setInterval(() => {
             for (let event in this._events) {
                 let { currentAttempts, threshold } = this._events[event];
-                console.log("checking", event, currentAttempts, threshold);
                 if (currentAttempts >= threshold) {
-                    console.log("showing", event);
                     this._events[event].currentAttempts = 0;
                     this._feedbackMessager.showMessage(event);
                 }
@@ -714,7 +713,7 @@ class FeedbackMessageDispatcher {
                 height: textHeight,
                 autoDraw: false,
                 bold: true,
-                wrapWidth: 1.8,
+                wrapWidth: 1.3,
             });
             view.showTime = message.showTime;
             this._messagesViews[message.name] = view;
