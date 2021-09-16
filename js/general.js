@@ -588,7 +588,7 @@ class TextInputProcessor extends UserInputProcessor {
                     this._feedbackMessager.showMessage(event);
                 }
             }
-        }, 100);
+        }, 500);
     }
 
     _fitInputWindow() {
