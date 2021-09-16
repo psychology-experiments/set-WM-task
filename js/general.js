@@ -690,11 +690,11 @@ class FeedbackMessageDispatcher {
             return;
         }
 
-        messageView.setAutoDraw(true);
-
         const chosenPosition = this._allPositions.values().next().value;
         this._allPositions.delete(chosenPosition);
         messageView.pos = chosenPosition;
+
+        messageView.setAutoDraw(true);
 
         const timeouID = setTimeout(
             () => this._stopMessageDrawing(messageView),
