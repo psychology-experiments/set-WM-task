@@ -531,6 +531,32 @@ class TextInputProcessor extends UserInputProcessor {
 
         this._symbolsDelimiter = symbolsDelimiter;
         this._allowedSymbols = new RegExp(allowedSymbolsRegExp, "g");
+
+        const feedbackMessages = [
+            new FeedbackMessage({
+                name: "toManySymbols",
+                messageText: "Достигнуто максимальное количество символов",
+                textColor: "#ff6700",
+                showTime: 2000,
+            }),
+        ];
+        const positionsForFeedback = [[0, -0.45]].map((pos) =>
+            screenSizeAdapter.rescalePosition(pos)
+        );
+        this._feedbackMessager = new FeedbackMessageDispatcher({
+            window: psychoJS.window,
+            textHeight: screenSizeAdapter.rescaleTextSize(0.05),
+            messages: feedbackMessages,
+            availiablePositions: positionsForFeedback,
+        });
+
+        this._events = {
+            toManySymbols: {
+                currentAttempts: 0,
+                threshold: 5,
+            },
+        };
+        this._feedbackCheckerId = null;
     }
 
     initilize(taskConditions) {
@@ -552,6 +578,18 @@ class TextInputProcessor extends UserInputProcessor {
         this._fitInputWindow();
         this._isInitilized = true;
         this._inputWindow.refresh();
+
+        this._feedbackCheckerId = setInterval(() => {
+            for (let event in this._events) {
+                let { currentAttempts, threshold } = this._events[event];
+                console.log("checking", event, currentAttempts, threshold);
+                if (currentAttempts >= threshold) {
+                    console.log("showing", event);
+                    this._events[event].currentAttempts = 0;
+                    this._feedbackMessager.showMessage(event);
+                }
+            }
+        }, 100);
     }
 
     _fitInputWindow() {
@@ -571,6 +609,10 @@ class TextInputProcessor extends UserInputProcessor {
         this._acceptLengthLesserThanMax = false;
         this._inputWindow.setAutoDraw(false);
         this._isInitilized = false;
+
+        clearInterval(this._feedbackCheckerId);
+        this._feedbackCheckerId = null;
+        this._feedbackMessager.stopAllMessages();
     }
 
     _getCurrentInput() {
@@ -602,6 +644,7 @@ class TextInputProcessor extends UserInputProcessor {
         const inputLength = currentAnswer.length;
 
         if (inputLength > this._maxLength) {
+            this._events.toManySymbols.currentAttempts += 1;
             this._removeLastCharacter(currentAnswer);
             return;
         }
@@ -671,6 +714,7 @@ class FeedbackMessageDispatcher {
                 height: textHeight,
                 autoDraw: false,
                 bold: true,
+                wrapWidth: 1.8,
             });
             view.showTime = message.showTime;
             this._messagesViews[message.name] = view;
