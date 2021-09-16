@@ -676,13 +676,15 @@ class FeedbackMessageDispatcher {
             this._messagesViews[message.name] = view;
         }
 
-        this._allPositions = availiablePositions;
+        this._allPositions = new Set(availiablePositions);
+        console.log("at the start", this._allPositions, availiablePositions);
         this._currentMessages = {};
     }
 
     _stopMessageDrawing(messageView) {
         messageView.setAutoDraw(false);
-        this._allPositions.unshift(messageView.pos);
+        this._allPositions.add(messageView.pos);
+        console.log("added");
     }
 
     _showMessage(messageName, messageView) {
@@ -692,7 +694,8 @@ class FeedbackMessageDispatcher {
 
         messageView.setAutoDraw(true);
 
-        const chosenPosition = this._allPositions.shift();
+        const chosenPosition = this._allPositions.values().next().value;
+        this._allPositions.delete(chosenPosition);
         messageView.pos = chosenPosition;
 
         const timeouID = setTimeout(
@@ -704,6 +707,11 @@ class FeedbackMessageDispatcher {
 
     showMessage(messageName) {
         const messageView = this._messagesViews[messageName];
+
+        if (messageName in this._currentMessages) {
+            this.stopMessage(messageName);
+        }
+
         this._showMessage(messageName, messageView);
     }
 
