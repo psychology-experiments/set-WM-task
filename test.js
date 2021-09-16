@@ -295,6 +295,11 @@ function experimentInit() {
             isForExperiment: false,
             nLoops: [0],
         },
+        "general instruction": {
+            routine: generalInstruction,
+            isForExperiment: true,
+            nLoops: [0],
+        },
         stroop: {
             task: stroop,
             userInputProcessor: singleKeyKeyboard,
@@ -350,6 +355,7 @@ function experimentInit() {
         },
         tasksAtTheBeginning: [
             "developer message",
+            "general instruction",
             "black schulte",
             "black and red schulte",
         ],
@@ -372,6 +378,41 @@ function developerMessage(snapshot) {
         height: 0.05,
         text: `Код находится в процессе разработки.\nДля переключения между задачами используйте 'ctrl', 
         который находится в левом нижнем углу клавиатуры`,
+        wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
+    });
+    developerInstruction.status = PsychoJS.Status.NOT_STARTED;
+    return function () {
+        if (developerInstruction.status === PsychoJS.Status.NOT_STARTED) {
+            developerInstruction.status = PsychoJS.Status.STARTED;
+            developerInstruction.setAutoDraw(true);
+            keyboardTaskSkipper.start();
+            keyboardTaskSkipper.clearEvents();
+        }
+
+        // Developer's option to look on different tasks
+        if (
+            developerInstruction.status === PsychoJS.Status.STARTED &&
+            keyboardTaskSkipper.getKeys({
+                keyList: ["lcontrol"],
+                waitRelease: false,
+            }).length > 0
+        ) {
+            developerInstruction.setAutoDraw(false);
+            keyboardTaskSkipper.stop();
+            keyboardTaskSkipper.clearEvents();
+            return Scheduler.Event.NEXT;
+        }
+
+        return Scheduler.Event.FLIP_REPEAT;
+    };
+}
+
+function generalInstruction(snapshot) {
+    let developerInstruction = new visual.TextStim({
+        win: psychoJS.window,
+        color: new util.Color("black"),
+        height: 0.05,
+        text: `ЗДЕСЬ ДОЛЖНА БЫТЬ ИНСТРУКЦИЯ ДЛЯ ВСЕГО ЭКСПЕРИМЕНТА`,
         wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
     });
     developerInstruction.status = PsychoJS.Status.NOT_STARTED;
