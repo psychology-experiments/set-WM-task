@@ -50,7 +50,7 @@ class LuchinsPresenter extends TaskPresenter {
                 showTime: 2000,
             }),
         ];
-        const positionsForFeedback = [[0, -0.3]].map((pos) =>
+        const positionsForFeedback = [[0, -0.15]].map((pos) =>
             screenSizeAdapter.rescalePosition(pos)
         );
         this._feedbackMessager = new general.FeedbackMessageDispatcher({
@@ -125,7 +125,7 @@ class LuchinsView extends TaskView {
 
         this._task = new visual.ImageStim({
             win: window,
-            pos: screenSizeAdapter.rescalePosition([0, 0.0]),
+            pos: screenSizeAdapter.rescalePosition([0, 0]),
             size: screenSizeAdapter.rescaleElementSize([0.6, 0.6]),
         });
 
@@ -133,7 +133,7 @@ class LuchinsView extends TaskView {
             win: window,
             text: instructionReminderText,
             color: "black",
-            pos: screenSizeAdapter.rescalePosition([0, 0.3]),
+            pos: screenSizeAdapter.rescalePosition([0, 0.34]),
             height: screenSizeAdapter.rescaleTextSize(0.03),
             wrapWidth: screenSizeAdapter.rescaleWrapWidth(0.9),
             autoDraw: false,
