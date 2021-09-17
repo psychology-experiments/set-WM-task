@@ -410,9 +410,18 @@ function generalInstruction(snapshot) {
     let developerInstruction = new visual.TextStim({
         win: psychoJS.window,
         color: new util.Color("black"),
-        height: 0.05,
-        text: `ЗДЕСЬ ДОЛЖНА БЫТЬ ИНСТРУКЦИЯ ДЛЯ ВСЕГО ЭКСПЕРИМЕНТА`,
-        wrapWidth: screenHeightRescaler.rescaleWrapWidth(0.8),
+        height: 0.03,
+        text: `Здравствуй! Спасибо за участие в эксперименте!
+        Сейчас тебе предстоит выполнить различные задания. Прежде чем мы начнем, стоит уточнить некоторые моменты:
+
+        1) Необходимо внимательно читать и запоминать инструкции, так как вернуться к ним будет нельзя
+        2) В заданиях не будет ничего сложного, но они могут тебя утомить. Если это произошло, то после выполнения заданий с последовательностью чёрных и красных цифр можно взять перерыв и немного отдохнуть. Мы бы даже советовали это сделать!
+        3) Нельзя выходить и закрывать программу, в которой ты работаешь, иначе придется начинать сначала
+        4) Тебе понадобится русская раскладка на клавиатуре. Давай сразу проверим, что у тебя включена именно она?
+        
+        Быстрее начнём – быстрее закончим, поехали!
+        Для перехода к заданиям нажми СТРЕЛКУ ВПРАВО`,
+        wrapWidth: screenHeightRescaler.rescaleWrapWidth(1.0),
     });
     developerInstruction.status = PsychoJS.Status.NOT_STARTED;
     return function () {
@@ -427,7 +436,7 @@ function generalInstruction(snapshot) {
         if (
             developerInstruction.status === PsychoJS.Status.STARTED &&
             keyboardTaskSkipper.getKeys({
-                keyList: ["lcontrol"],
+                keyList: ["right"],
                 waitRelease: false,
             }).length > 0
         ) {
