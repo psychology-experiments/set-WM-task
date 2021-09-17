@@ -443,6 +443,7 @@ function generalInstruction(snapshot) {
             developerInstruction.setAutoDraw(false);
             keyboardTaskSkipper.stop();
             keyboardTaskSkipper.clearEvents();
+            psychoJS.eventManager.clearEvents();
             return Scheduler.Event.NEXT;
         }
 
@@ -472,6 +473,7 @@ function instructionRoutine(instructionInfo, task) {
             instructionPresenter.stop();
             keyboardTaskSkipper.stop();
             keyboardTaskSkipper.clearEvents();
+            psychoJS.eventManager.clearEvents();
             return Scheduler.Event.NEXT;
         }
 
@@ -523,8 +525,10 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
 
         // check for quit (typically the Esc key)
         if (
-            psychoJS.experiment.experimentEnded ||
-            psychoJS.eventManager.getKeys({ keyList: ["escape"] }).length > 0
+            experimentSequence.isInDevelopment &&
+            (psychoJS.experiment.experimentEnded ||
+                psychoJS.eventManager.getKeys({ keyList: ["escape"] }).length >
+                    0)
         ) {
             return quitPsychoJS(
                 "The [Escape] key was pressed. Goodbye!",
