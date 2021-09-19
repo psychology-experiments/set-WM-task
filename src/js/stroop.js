@@ -233,7 +233,7 @@ class StroopTestView extends TaskView {
 
         this._stroopHint = new visual.ImageStim({
             win: window,
-            image: "stroopHint",
+            image: "stroopHint.png",
             pos: screenSizeAdapter.rescalePosition([0, 0.3]),
             size: screenSizeAdapter.rescaleElementSize([0.18, 0.1]),
         });

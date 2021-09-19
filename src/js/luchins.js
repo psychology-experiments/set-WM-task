@@ -3,7 +3,7 @@ import { util, visual } from "../lib/psychojs-2021.2.2.js";
 import { TaskPresenter, TaskView, Instruction } from "./general.js";
 import * as general from "./general.js";
 
-const instructionPathName = "LuchinsInstruction";
+const instructionPathName = "LuchinsInstruction.png";
 
 const instructionReminderText = `
 Используемое математическое выражение должно быть максимально приближено 
@@ -73,7 +73,7 @@ class LuchinsPresenter extends TaskPresenter {
         this._taskPossibleSolutions = this._tasksSolutions[this._taskIdx];
         this._view.setLuchinsTask(this._taskNumber);
         this._taskIdx += 1;
-        this._taskNumber = `Luchins${this._taskIdx + 1}`;
+        this._taskNumber = `Luchins${this._taskIdx + 1}.jpg`;
         this._trialFinished = false;
     }
 

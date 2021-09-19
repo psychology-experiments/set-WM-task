@@ -23,7 +23,7 @@ let expInfo = { code: "" };
 
 // init psychoJS:
 const psychoJS = new PsychoJS({
-    debug: true,
+    debug: false,
 });
 
 // open window:
@@ -75,23 +75,23 @@ psychoJS.start({
     expInfo: expInfo,
     resources: [
         {
-            name: "stroopHint",
+            name: "stroopHint.png",
             path: "materials/StroopTest/InstructionHint.png",
         },
         {
-            name: "LuchinsInstruction",
+            name: "LuchinsInstruction.png",
             path: "materials/Luchins/instruction.png",
         },
-        { name: "Luchins1", path: "materials/Luchins/1.jpg" },
-        { name: "Luchins2", path: "materials/Luchins/2.jpg" },
-        { name: "Luchins3", path: "materials/Luchins/3.jpg" },
-        { name: "Luchins4", path: "materials/Luchins/4.jpg" },
-        { name: "Luchins5", path: "materials/Luchins/5.jpg" },
-        { name: "Luchins6", path: "materials/Luchins/6.jpg" },
-        { name: "Luchins7", path: "materials/Luchins/7.jpg" },
-        { name: "Luchins8", path: "materials/Luchins/8.jpg" },
-        { name: "Luchins9", path: "materials/Luchins/9.jpg" },
-        { name: "Luchins10", path: "materials/Luchins/10.jpg" },
+        { name: "Luchins1.jpg", path: "materials/Luchins/1.jpg" },
+        { name: "Luchins2.jpg", path: "materials/Luchins/2.jpg" },
+        { name: "Luchins3.jpg", path: "materials/Luchins/3.jpg" },
+        { name: "Luchins4.jpg", path: "materials/Luchins/4.jpg" },
+        { name: "Luchins5.jpg", path: "materials/Luchins/5.jpg" },
+        { name: "Luchins6.jpg", path: "materials/Luchins/6.jpg" },
+        { name: "Luchins7.jpg", path: "materials/Luchins/7.jpg" },
+        { name: "Luchins8.jpg", path: "materials/Luchins/8.jpg" },
+        { name: "Luchins9.jpg", path: "materials/Luchins/9.jpg" },
+        { name: "Luchins10.jpg", path: "materials/Luchins/10.jpg" },
     ],
 });
 
@@ -358,7 +358,7 @@ function experimentInit() {
             "black schulte",
             "black and red schulte",
         ],
-        isInDevelopment: true,
+        isInDevelopment: false,
         // showOnly: "stroop",
         showOnly: null,
         showInstructions: true,
