@@ -486,8 +486,6 @@ function instructionRoutine(instructionInfo, task) {
 
 function taskRoutineBegin(snapshot, task, userInputProcessor) {
     return function () {
-        console.count("begin");
-
         if (experimentSequence.isInDevelopment) {
             keyboardTaskSkipper.start();
             keyboardTaskSkipper.clearEvents();
@@ -521,7 +519,6 @@ function taskRoutineEachFrame(snapshot, task, userInputProcessor) {
         }
 
         if (task.isTrialFinished()) {
-            console.log("trial finished");
             task.addUnfinishedTrialData(userInputProcessor);
             return Scheduler.Event.NEXT;
         }
@@ -566,7 +563,6 @@ function taskRoutineEnd(snapshot, task, userInputProcessor) {
         userInputProcessor.stop();
 
         if (task.isTaskFinished()) {
-            console.log("task finished");
             snapshot.finished = true;
         }
 
