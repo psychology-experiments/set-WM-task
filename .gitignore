@@ -52,6 +52,9 @@ Thumbs.db
 # /lib/
 # /html/lib/
 
+# npm modules
+node_modules/
+
 # Developer's files
 taskeditor.html
 ТЗ/
