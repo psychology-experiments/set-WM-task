@@ -358,7 +358,7 @@ function experimentInit() {
             "black schulte",
             "black and red schulte",
         ],
-        isInDevelopment: false,
+        isInDevelopment: true,
         // showOnly: "stroop",
         showOnly: null,
         showInstructions: true,

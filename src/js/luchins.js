@@ -22,7 +22,7 @@ class LuchinsPresenter extends TaskPresenter {
 
         this._taskIdx = 0;
         this._taskPossibleSolutions = null;
-        this._taskNumber = `Luchins${this._taskIdx + 1}`;
+        this._taskNumber = `Luchins${this._taskIdx + 1}.jpg`;
         this._tasksSolutions = [
             ["37-21-3-3", "37-3-21-3", "37-3-3-21"],
             ["37-24-2-2", "37-2-24-2", "37-2-2-24"],
