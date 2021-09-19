@@ -1,0 +1,1 @@
+/*! For license information please see psychojs-2021.2.2.js.LEGAL.txt */
