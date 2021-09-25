@@ -1,6 +1,7 @@
 /*************
  * Test Test *
  *************/
+
 import { core, data, util, visual } from "./lib/psychojs-2021.2.2.js";
 const { PsychoJS } = core;
 const { TrialHandler } = data;
@@ -76,22 +77,88 @@ psychoJS.start({
     resources: [
         {
             name: "stroopHint.png",
-            path: "materials/StroopTest/InstructionHint.png",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/StroopTest/InstructionHint.png"
+            ),
         },
         {
             name: "LuchinsInstruction.png",
-            path: "materials/Luchins/instruction.png",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/instruction.png"
+            ),
         },
-        { name: "Luchins1.jpg", path: "materials/Luchins/1.jpg" },
-        { name: "Luchins2.jpg", path: "materials/Luchins/2.jpg" },
-        { name: "Luchins3.jpg", path: "materials/Luchins/3.jpg" },
-        { name: "Luchins4.jpg", path: "materials/Luchins/4.jpg" },
-        { name: "Luchins5.jpg", path: "materials/Luchins/5.jpg" },
-        { name: "Luchins6.jpg", path: "materials/Luchins/6.jpg" },
-        { name: "Luchins7.jpg", path: "materials/Luchins/7.jpg" },
-        { name: "Luchins8.jpg", path: "materials/Luchins/8.jpg" },
-        { name: "Luchins9.jpg", path: "materials/Luchins/9.jpg" },
-        { name: "Luchins10.jpg", path: "materials/Luchins/10.jpg" },
+        {
+            name: "Luchins1.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/1.jpg"
+            ),
+        },
+        {
+            name: "Luchins2.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/2.jpg"
+            ),
+        },
+        {
+            name: "Luchins3.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/3.jpg"
+            ),
+        },
+        {
+            name: "Luchins4.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/4.jpg"
+            ),
+        },
+        {
+            name: "Luchins5.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/5.jpg"
+            ),
+        },
+        {
+            name: "Luchins6.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/6.jpg"
+            ),
+        },
+        {
+            name: "Luchins7.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/7.jpg"
+            ),
+        },
+        {
+            name: "Luchins8.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/8.jpg"
+            ),
+        },
+        {
+            name: "Luchins9.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/9.jpg"
+            ),
+        },
+        {
+            name: "Luchins10.jpg",
+            path: general.getFPRelativeToScriptPath(
+                "mainScript",
+                "materials/Luchins/10.jpg"
+            ),
+        },
     ],
 });
 

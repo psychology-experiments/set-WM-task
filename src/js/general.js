@@ -1125,6 +1125,18 @@ class ScreenHeightRescaler {
     }
 }
 
+function getFPRelativeToScriptPath(scriptId, fp) {
+    const baseLocation = location.origin;
+    const script = document.getElementById(scriptId);
+    const scriptPath = script.src.split("?")[0]; // remove any ?query
+    const relativeScriptDir = scriptPath
+        .replace(baseLocation, "")
+        .split("/")
+        .slice(0, -1)
+        .join("/");
+    return relativeScriptDir + "/" + fp;
+}
+
 function choice(seq) {
     // Choose a random element from a non-empty sequence.
     let length = seq.length;
@@ -1178,4 +1190,5 @@ export {
     choices,
     cartesian,
     cumsum,
+    getFPRelativeToScriptPath,
 };
